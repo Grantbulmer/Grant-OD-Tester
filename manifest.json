@@ -1,26 +1,20 @@
 {
-  "name": "Grant OS Friend Tester",
-  "short_name": "Grant OS Test",
-  "description": "Grant OS clean friend tester build",
-  "start_url": "./?v=283-friend-tester-render-stability",
+  "name": "Grant OS Tester",
+  "short_name": "Tester",
+  "start_url": "./?v=283-tester-build",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#020617",
-  "theme_color": "#020617",
+  "background_color": "#071021",
+  "theme_color": "#071021",
   "icons": [
     {
-      "src": "icon-192.png?v=283-friend-tester-render-stability",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png?v=283-friend-tester-render-stability",
+      "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
-    },
-    {
-      "src": "apple-touch-icon.png?v=283-friend-tester-render-stability",
-      "sizes": "180x180",
       "type": "image/png"
     }
   ]
