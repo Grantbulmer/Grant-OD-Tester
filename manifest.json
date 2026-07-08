@@ -1,7 +1,7 @@
 {
-  "name": "Grant OS Tester",
-  "short_name": "Tester",
-  "start_url": "./?v=286-tester-housekeeping-scroll-stability",
+  "name": "Grant OS Test Build 3.0",
+  "short_name": "Grant OS Test",
+  "start_url": "./?v=test-build-3-0-performance-stability",
   "scope": "./",
   "display": "standalone",
   "background_color": "#071021",
