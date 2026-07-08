@@ -47,6 +47,13 @@ commercially without written permission from Grant Bulmer.
 .gos-cr-actions{margin-top:12px;display:flex;justify-content:flex-start;gap:10px;flex-wrap:wrap;}
 #relocation table input,#career table input{min-width:0;width:100%;box-sizing:border-box;}
 #relocation table th:last-child,#career table th:last-child{width:96px;}
+
+/* Build 3.0 relocation edit stability */
+#relocation table{table-layout:fixed;width:100%;}
+#relocation td,#relocation th{vertical-align:middle;overflow-wrap:anywhere;}
+#relocation input{min-width:0;width:100%;box-sizing:border-box;}
+#relocation .gos-cr-actions button{white-space:normal;}
+
 </style>
 
 <title>Grant OS Test Build 3.0</title>
@@ -1387,7 +1394,6 @@ header .pill{vertical-align:middle;}
         <table id="debtTable"></table>
         <button class="primary" onclick="App.saveAndRender()">Save debt figures</button> <button onclick="Debt.add()">Add debt</button>
       </div>
-      <div class="card wide"><h3>Priority Queue</h3><div id="priorityQueue"></div></div>
       <div class="card wide"><h3>Debt Progress</h3><div id="debtProgressList"></div></div>
       <div class="card full">
         <h3>Smarter Overpayment Simulator</h3>
@@ -1447,8 +1453,8 @@ header .pill{vertical-align:middle;}
 
 <section id="relocation" class="section">
     <div class="grid">
-      <div class="card wide"><h3>Thailand Fund</h3><table id="thaiTable"></table><div class="gos-cr-actions"><button type="button" onclick="Relocation.add('thai')">Add Thailand item</button></div></div>
-      <div class="card wide"><h3>New Zealand Fund</h3><table id="nzTable"></table><div class="gos-cr-actions"><button type="button" onclick="Relocation.add('nz')">Add New Zealand item</button></div></div>
+      <div class="card wide"><h3>Relocation Fund 1</h3><table id="thaiTable"></table><div class="gos-cr-actions"><button type="button" onclick="Relocation.add('thai')">Add relocation item</button></div></div>
+      <div class="card wide"><h3>Relocation Fund 2</h3><table id="nzTable"></table><div class="gos-cr-actions"><button type="button" onclick="Relocation.add('nz')">Add relocation item</button></div></div>
     </div>
   </section>
 
@@ -1759,7 +1765,7 @@ const Debt = {
     state.debts.filter(d=>Calc.debtType(d)==="Flexible"&&Number(d[1]||0)>0).forEach(d=>items.push(["Repay "+d[0],money(d[1])+" flexible balance",40+Calc.debtPriority(d)]));
     if(Number(state.emergencyFund)<Number(state.emergencyTarget))items.push(["Build emergency fund",money(state.emergencyFund)+" / "+money(state.emergencyTarget),80]);
     items.sort((a,b)=>a[2]-b[2]);
-    document.getElementById("priorityQueue").innerHTML=items.slice(0,6).map((x,i)=>`<div style="margin:10px 0"><span class="pill">#${i+1}</span> <strong>${x[0]}</strong><br><span class="note">${x[1]}</span></div>`).join("");
+    const priorityQueueEl=document.getElementById("priorityQueue"); if(priorityQueueEl) priorityQueueEl.innerHTML=items.slice(0,6).map((x,i)=>`<div style="margin:10px 0"><span class="pill">#${i+1}</span> <strong>${x[0]}</strong><br><span class="note">${x[1]}</span></div>`).join("");
   },
   simulator(){
     const regs=state.debts.filter(d=>Calc.debtType(d)==="Regular"&&Number(d[1])>0);
@@ -1805,37 +1811,56 @@ const Relocation = {
   rows(type){
     Data.ensure();
     if(!Array.isArray(state[type])) state[type]=[];
-    state[type]=state[type].map(r=>[r?.[0]||"", Number(r?.[1]||0), Number(r?.[2]||0)]);
+    state[type]=state[type].map(r=>[
+      String((r && r[0]) ?? ""),
+      Number((r && r[1]) || 0),
+      Number((r && r[2]) || 0)
+    ]);
     return state[type];
   },
+  refreshTimer:null,
   softRefresh(){
     try{ Data.save(); }catch(e){}
-    try{ Dashboard.render(); }catch(e){}
-    try{ GraphsV21.render(); }catch(e){}
-    try{ SnapshotV24.render(); }catch(e){}
+    clearTimeout(this.refreshTimer);
+    this.refreshTimer=setTimeout(()=>{
+      try{ Dashboard.render(); }catch(e){}
+      try{ GraphsV21.render(); }catch(e){}
+      try{ SnapshotV24.render(); }catch(e){}
+      try{ if(window.PriorityQueueV30 && PriorityQueueV30.render) PriorityQueueV30.render(); }catch(e){}
+    },180);
   },
   update(type,i,field,value){
     const rows=this.rows(type); if(!rows[i]) return;
-    rows[i][field] = field===0 ? value : Number(value||0);
+    rows[i][field] = field===0 ? String(value ?? "") : Number(value||0);
+    this.softRefresh();
+  },
+  commit(){
+    try{ Data.save(); }catch(e){}
     this.softRefresh();
   },
   add(type){
     const rows=this.rows(type);
     rows.push(["New item",0,0]);
     try{ Data.save(); }catch(e){}
-    this.render(); this.softRefresh();
+    this.render();
+    this.softRefresh();
   },
   remove(type,i){
     const rows=this.rows(type); if(!rows[i]) return;
     if(confirm("Remove this relocation item?")){
       rows.splice(i,1);
       try{ Data.save(); }catch(e){}
-      this.render(); this.softRefresh();
+      this.render();
+      this.softRefresh();
     }
   },
   table(id,type){
-    this.rows(type);
-    UI.table(id,["Item","Target","Saved","Remove"],state[type],(r,i)=>`<td><input value="${this.esc(r[0])}" oninput="Relocation.update('${type}',${i},0,this.value)"></td><td><input type="number" value="${Number(r[1]||0)}" oninput="Relocation.update('${type}',${i},1,this.value)"></td><td><input type="number" value="${Number(r[2]||0)}" oninput="Relocation.update('${type}',${i},2,this.value)"></td><td><button type="button" class="danger" onclick="Relocation.remove('${type}',${i})">Remove</button></td>`);
+    const rows=this.rows(type);
+    UI.table(id,["Item","Target","Saved","Remove"],rows,(r,i)=>`
+      <td><input value="${this.esc(r[0])}" placeholder="Relocation item" oninput="Relocation.update('${type}',${i},0,this.value)" onblur="Relocation.commit()"></td>
+      <td><input type="number" value="${Number(r[1]||0)}" oninput="Relocation.update('${type}',${i},1,this.value)" onblur="Relocation.commit()"></td>
+      <td><input type="number" value="${Number(r[2]||0)}" oninput="Relocation.update('${type}',${i},2,this.value)" onblur="Relocation.commit()"></td>
+      <td><button type="button" class="danger" onclick="Relocation.remove('${type}',${i})">Remove</button></td>`);
   },
   render(){
     this.table("thaiTable","thai");
@@ -1992,7 +2017,7 @@ const Timeline = {
     items.push({
       date:null,title:"Relocation fund",type:"Goal",amount:Math.max(0,10000-relocation),
       detail:`${money(relocation)} / £10,000`,
-      subdetail:"Ongoing Thailand/New Zealand fund.", cls:relocation>=10000?"green":"amber"
+      subdetail:"Ongoing relocation fund.", cls:relocation>=10000?"green":"amber"
     });
 
     return items.sort((a,b)=>{
@@ -5970,17 +5995,20 @@ StableInputV254.patch();
       <p class="note">Now shows true spare from real linked account money only. Wage is a reference; it only counts once it is actually in your accounts. The figure deducts bills due before payday, debt payments and living spend based on days until payday.</p>
       <div id="v283SpareValue" class="big value-soft value-warning">£0</div>
       <div id="v283SpareStatus" class="v283-spare-status">Calculating...</div>
-      <div class="v283-spare-breakdown">
-        <div><span>Available account money</span><strong id="v283SpareAvailableCash">£0</strong></div>
-        <div><span>Days until payday</span><strong id="v283SpareDays">0</strong></div>
-        <div><span>Bills due before payday</span><strong id="v283SpareBills">£0</strong></div>
-        <div><span>Debt payments/reserve</span><strong id="v283SpareDebt">£0</strong></div>
-        <div><span>Living spend reserve</span><strong id="v283SpareLiving">£0</strong></div>
-        <div><span>Total commitments due</span><strong id="v283SpareCommitments">£0</strong></div>
-        <div><span>Net bank position</span><strong id="v283SpareBank">£0</strong></div>
-        <div><span>Total overdraft used</span><strong id="v283SpareOverdraft">£0</strong></div>
-        <div><span>Monthly wage reference</span><strong id="v283SpareWage">£0</strong></div>
-      </div>
+      <details class="v283-spare-details">
+        <summary>How is this calculated?</summary>
+        <div class="v283-spare-breakdown">
+          <div><span>Available account money</span><strong id="v283SpareAvailableCash">£0</strong></div>
+          <div><span>Days until payday</span><strong id="v283SpareDays">0</strong></div>
+          <div><span>Bills due before payday</span><strong id="v283SpareBills">£0</strong></div>
+          <div><span>Debt payments/reserve</span><strong id="v283SpareDebt">£0</strong></div>
+          <div><span>Living spend reserve</span><strong id="v283SpareLiving">£0</strong></div>
+          <div><span>Total commitments due</span><strong id="v283SpareCommitments">£0</strong></div>
+          <div><span>Net bank position</span><strong id="v283SpareBank">£0</strong></div>
+          <div><span>Total overdraft used</span><strong id="v283SpareOverdraft">£0</strong></div>
+          <div><span>Monthly wage reference</span><strong id="v283SpareWage">£0</strong></div>
+        </div>
+      </details>
     `;
   }
   function ensureCard(){
@@ -6049,7 +6077,12 @@ StableInputV254.patch();
       .v283-spare-status{margin:8px 0 12px;padding:10px 12px;border-radius:14px;font-weight:700;line-height:1.35;border:1px solid rgba(148,163,184,.22);background:rgba(15,23,42,.52);color:#cbd5e1;}
       .v283-spare-status.v283-good{border-color:rgba(34,197,94,.35);background:rgba(20,83,45,.18);color:#bbf7d0;}
       .v283-spare-status.v283-warn{border-color:rgba(245,158,11,.35);background:rgba(120,53,15,.20);color:#fde68a;}
-      .v283-spare-breakdown{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:10px;}
+      .v283-spare-details{margin-top:10px;border:1px solid rgba(148,163,184,.18);border-radius:14px;background:rgba(15,23,42,.38);overflow:hidden;}
+      .v283-spare-details summary{cursor:pointer;list-style:none;padding:11px 12px;font-weight:800;color:#dbeafe;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+      .v283-spare-details summary::-webkit-details-marker{display:none;}
+      .v283-spare-details summary:after{content:'⌄';font-size:1rem;color:#93c5fd;transition:transform .18s ease;}
+      .v283-spare-details[open] summary:after{transform:rotate(180deg);}
+      .v283-spare-breakdown{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:0;padding:0 10px 10px;}
       .v283-spare-breakdown>div{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 10px;border-radius:12px;background:rgba(2,6,23,.46);border:1px solid rgba(148,163,184,.16);}
       .v283-spare-breakdown span{color:#9fb2cc;font-size:.9rem;}
       .v283-spare-breakdown strong{color:#f8fafc;text-align:right;white-space:nowrap;}
@@ -9299,6 +9332,436 @@ body.gos-perf-scrolling #grantOSHelperBtn{animation:none!important;}
   document.addEventListener('change',e=>{ if(e.target&&e.target.closest&&e.target.closest('#app')) schedule(180); },true);
   document.addEventListener('click',e=>{ if(e.target&&e.target.closest&&e.target.closest('#app')) schedule(250); },true);
   window.GrantOSAlertsTop3={limit:LIMIT,render:renderAlerts,rows:topRows};
+})();
+</script>
+
+
+
+<style id="build30DebtQueueRemoveSpareDropdownStyle">
+/* Build 3.0: removed Debt Tracker Priority Queue card and made Estimated Spare breakdown collapsible. */
+#debt #priorityQueue{display:none!important;}
+#v283EstimatedSpareCard .v283-spare-details{margin-top:10px;border:1px solid rgba(148,163,184,.18);border-radius:14px;background:rgba(15,23,42,.38);overflow:hidden;}
+#v283EstimatedSpareCard .v283-spare-details summary{cursor:pointer;list-style:none;padding:11px 12px;font-weight:800;color:#dbeafe;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+#v283EstimatedSpareCard .v283-spare-details summary::-webkit-details-marker{display:none;}
+#v283EstimatedSpareCard .v283-spare-details summary:after{content:'⌄';font-size:1rem;color:#93c5fd;transition:transform .18s ease;}
+#v283EstimatedSpareCard .v283-spare-details[open] summary:after{transform:rotate(180deg);}
+#v283EstimatedSpareCard .v283-spare-details .v283-spare-breakdown{margin:0;padding:0 10px 10px;}
+</style>
+<script id="build30DebtQueueRemoveSpareDropdown">
+(function(){
+  function makeSpareDropdown(){
+    try{
+      const card=document.getElementById('v283EstimatedSpareCard');
+      if(!card) return;
+      let breakdown=card.querySelector('.v283-spare-breakdown');
+      if(!breakdown) return;
+      if(breakdown.closest('.v283-spare-details')) return;
+      const details=document.createElement('details');
+      details.className='v283-spare-details';
+      const summary=document.createElement('summary');
+      summary.textContent='How is this calculated?';
+      breakdown.parentNode.insertBefore(details,breakdown);
+      details.appendChild(summary);
+      details.appendChild(breakdown);
+    }catch(e){}
+  }
+  function removeDebtQueue(){
+    try{
+      const q=document.getElementById('priorityQueue');
+      const card=q&&q.closest('.card');
+      if(card && card.closest('#debt')) card.remove();
+    }catch(e){}
+  }
+  function patchDebtPriority(){
+    try{
+      if(window.Debt && !Debt.__gosNoDebtQueue){
+        Debt.priority=function(){};
+        Debt.__gosNoDebtQueue=true;
+      }
+    }catch(e){}
+  }
+  function run(){removeDebtQueue(); makeSpareDropdown(); patchDebtPriority();}
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run); else run();
+  window.addEventListener('load',()=>{run(); setTimeout(run,250); setTimeout(run,900);});
+  document.addEventListener('click',()=>setTimeout(run,80),true);
+  document.addEventListener('input',()=>setTimeout(run,120),true);
+  document.addEventListener('change',()=>setTimeout(run,120),true);
+})();
+</script>
+
+
+
+<style id="build30DropdownSummaryCleanupStyle">
+/* Build 3.0 dropdown summary cleanup: keeps tabs tidier without changing calculation sources. */
+.gos-section-dropdown{margin-top:12px;border:1px solid rgba(148,163,184,.18);border-radius:16px;background:rgba(15,23,42,.34);overflow:hidden;}
+.gos-section-dropdown summary{cursor:pointer;list-style:none;padding:12px 14px;font-weight:900;color:#dbeafe;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;}
+.gos-section-dropdown summary::-webkit-details-marker{display:none;}
+.gos-section-dropdown summary:after{content:'⌄';font-size:1rem;color:#93c5fd;transition:transform .18s ease;flex:0 0 auto;}
+.gos-section-dropdown[open] summary:after{transform:rotate(180deg);}
+.gos-dropdown-content{padding:0 12px 12px;}
+.gos-dropdown-content table{margin-top:0;}
+.gos-budget-bills-summary-card,.v276-debt-summary-card{min-height:unset!important;}
+.gos-summary-total,.v276-summary-total{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid rgba(148,163,184,.18);background:rgba(15,23,42,.40);border-radius:14px;padding:12px 14px;margin:10px 0;font-weight:800;}
+.gos-summary-total strong,.v276-summary-total strong{font-size:1.25rem;color:#e0f2fe;white-space:nowrap;}
+.gos-summary-list,.v276-debt-list{display:grid;gap:8px;margin-top:10px;}
+.gos-summary-line,.v276-debt-line{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;border:1px solid rgba(148,163,184,.14);background:rgba(15,23,42,.26);border-radius:12px;padding:9px 10px;}
+.gos-summary-line span,.v276-debt-line span{min-width:0;overflow-wrap:anywhere;}
+.gos-summary-line em,.v276-debt-line em{display:block;font-style:normal;color:#94a3b8;font-size:.78rem;margin-top:2px;}
+.gos-summary-line strong,.v276-debt-line strong{white-space:nowrap;color:#f8fafc;}
+@media(max-width:760px){
+  .gos-section-dropdown summary{padding:11px 12px;font-size:.95rem;}
+  .gos-dropdown-content{padding:0 10px 10px;}
+  .gos-summary-line,.v276-debt-line{display:block;}
+  .gos-summary-line strong,.v276-debt-line strong{display:block;margin-top:5px;}
+}
+</style>
+<script id="build30DropdownSummaryCleanup">
+(function(){
+  const PATCH='build30DropdownSummaryCleanup';
+  const esc=s=>String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]));
+  const num=v=>{ const n=Number(v); return Number.isFinite(n)?n:0; };
+  const money=v=>'£'+num(v).toLocaleString('en-GB',{maximumFractionDigits:2});
+  const norm=s=>String(s||'').trim().toLowerCase().replace(/\s+/g,' ');
+  let timer=null;
+
+  function cardByHeading(sectionSel, patterns){
+    const section=document.querySelector(sectionSel); if(!section) return null;
+    const pats=(Array.isArray(patterns)?patterns:[patterns]).map(p=>p instanceof RegExp?p:new RegExp('^'+String(p).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'$','i'));
+    const cards=[...section.querySelectorAll('.card')];
+    return cards.find(card=>{
+      const h=card.querySelector('h3'); const txt=(h&&h.textContent||'').trim();
+      return pats.some(p=>p.test(txt));
+    })||null;
+  }
+
+  function directChildren(el){ return Array.from(el.childNodes); }
+  function ensureDropdown(card, key, summaryText, anchor){
+    if(!card) return;
+    anchor = anchor || card.querySelector('h3');
+    if(!anchor) return;
+    const cls='gos-dd-'+key;
+    let details=Array.from(card.children).find(el=>el.classList&&el.classList.contains(cls));
+    if(!details){
+      details=document.createElement('details');
+      details.className='gos-section-dropdown '+cls;
+      const summary=document.createElement('summary');
+      const body=document.createElement('div'); body.className='gos-dropdown-content';
+      details.appendChild(summary); details.appendChild(body);
+      anchor.insertAdjacentElement('afterend', details);
+    }
+    const summary=details.querySelector('summary'); if(summary) summary.textContent=summaryText;
+    const body=details.querySelector('.gos-dropdown-content') || details.appendChild(document.createElement('div'));
+    body.className='gos-dropdown-content';
+
+    // Move every direct child after the heading/header into the dropdown, while keeping the heading/header visible.
+    let seenAnchor=false;
+    directChildren(card).forEach(node=>{
+      if(node===anchor){ seenAnchor=true; return; }
+      if(node===details) return;
+      if(!seenAnchor) return;
+      body.appendChild(node);
+    });
+  }
+
+  function wrapBudgetSections(){
+    const core=cardByHeading('#budget','Core Figures');
+    ensureDropdown(core,'budget-core','Open core figures', core&&core.querySelector('h3'));
+
+    const linked=document.getElementById('v25531BudgetAccountsCard');
+    if(linked){
+      const head=linked.querySelector('.v25531-linked-head') || linked.querySelector('h3');
+      ensureDropdown(linked,'budget-linked','Open linked accounts', head);
+    }
+
+    const fixed=cardByHeading('#budget',[/^Monthly Fixed Costs/i,/^Monthly Fixed Costs \/ Bills/i]);
+    ensureDropdown(fixed,'budget-bills','Open monthly bills', fixed&&fixed.querySelector('h3'));
+  }
+
+  function wrapDebtSections(){
+    const tracker=cardByHeading('#debts','Debt Tracker');
+    ensureDropdown(tracker,'debt-tracker','Open debt accounts', tracker&&tracker.querySelector('h3'));
+
+    const progress=cardByHeading('#debts','Debt Progress');
+    ensureDropdown(progress,'debt-progress','Open debt progress', progress&&progress.querySelector('h3'));
+  }
+
+  function wrapHolidaySections(){
+    const pots=cardByHeading('#holidays','Holiday Pots');
+    ensureDropdown(pots,'holiday-pots','Open holiday pots', pots&&pots.querySelector('h3'));
+  }
+
+  function normalBillRows(){
+    try{
+      if(typeof Calc!=='undefined' && Calc && typeof Calc.normalBillTotal==='function') Calc.normalBillTotal();
+    }catch(e){}
+    const fixed=(typeof state!=='undefined' && Array.isArray(state.fixed))?state.fixed:[];
+    const debtNames=new Set(((typeof state!=='undefined' && Array.isArray(state.debts))?state.debts:[]).map(d=>norm(d&&d[0])).filter(Boolean));
+    return fixed.filter(r=>r && !debtNames.has(norm(r[0]))).map(r=>({name:r[0]||'Bill', amount:num(r[1]), due:r[2]||''}));
+  }
+
+  function renderBillsSummary(){
+    try{
+      const fixed=cardByHeading('#budget',[/^Monthly Fixed Costs/i,/^Monthly Fixed Costs \/ Bills/i]);
+      if(!fixed) return;
+      let card=document.getElementById('gosBudgetBillsSummaryCard');
+      if(!card){
+        card=document.createElement('div');
+        card.id='gosBudgetBillsSummaryCard';
+        card.className='card full gos-budget-bills-summary-card';
+        fixed.insertAdjacentElement('afterend', card);
+      }
+      const rows=normalBillRows();
+      const total=rows.reduce((s,r)=>s+num(r.amount),0);
+      card.innerHTML=`
+        <h3>Monthly Bills from Budget Setup</h3>
+        <p class="note">Normal bills only. Debt repayments are shown in the Debt Tracker tab and still feed the wider calculations automatically.</p>
+        <div class="gos-summary-total"><span>Monthly bills total</span><strong>${money(total)}</strong></div>
+        ${rows.length?`<div class="gos-summary-list">${rows.map(r=>`<div class="gos-summary-line"><span>${esc(r.name)}${r.due?`<em>Due ${esc(r.due)}</em>`:''}</span><strong>${money(r.amount)}</strong></div>`).join('')}</div>`:`<div class="v274-mobile-empty">No monthly bills currently entered.</div>`}
+      `;
+    }catch(e){ console.warn(PATCH,'bills summary',e); }
+  }
+
+  function debtRepaymentRows(){
+    try{
+      if(typeof Calc!=='undefined' && Calc && typeof Calc.debtMonthlyRows==='function'){
+        const rows=Calc.debtMonthlyRows();
+        if(Array.isArray(rows)) return rows.map(r=>({name:r.name||'Debt', type:r.type||'', monthly:num(r.monthly)}));
+      }
+    }catch(e){}
+    const debts=(typeof state!=='undefined' && Array.isArray(state.debts))?state.debts:[];
+    return debts.filter(d=>d&&num(d[2])>0&&num(d[1])>0).map(d=>({name:d[0]||'Debt',type:d[4]||'',monthly:num(d[2])}));
+  }
+
+  function renderDebtRepaymentsInDebtTab(){
+    try{
+      const grid=document.querySelector('#debts .grid'); if(!grid) return;
+      let card=document.getElementById('v276DebtRepaymentsCard');
+      if(!card){
+        card=document.createElement('div');
+        card.id='v276DebtRepaymentsCard';
+      }
+      card.className='card wide v276-debt-summary-card';
+      const progress=cardByHeading('#debts','Debt Progress');
+      const tracker=cardByHeading('#debts','Debt Tracker');
+      if(!card.closest('#debts')){
+        if(progress) progress.insertAdjacentElement('afterend',card);
+        else if(tracker) tracker.insertAdjacentElement('afterend',card);
+        else grid.insertBefore(card, grid.firstChild);
+      }
+      const rows=debtRepaymentRows();
+      const total=rows.reduce((s,r)=>s+num(r.monthly),0);
+      card.innerHTML=`
+        <h3>Debt Repayments</h3>
+        <p class="note">Read-only summary. Add, remove or edit debt repayments above in Debt Tracker.</p>
+        <div class="v276-summary-total"><span>Monthly debt repayments</span><strong>${money(total)}</strong></div>
+        ${rows.length?`<div class="v276-debt-list">${rows.map(r=>`<div class="v276-debt-line"><span>${esc(r.name)} <em>${esc(r.type)}</em></span><strong>${money(r.monthly)}</strong></div>`).join('')}</div>`:`<div class="v274-mobile-empty">No monthly debt repayments currently active.</div>`}
+      `;
+    }catch(e){ console.warn(PATCH,'debt repayment move',e); }
+  }
+
+  function run(){
+    try{
+      renderBillsSummary();
+      renderDebtRepaymentsInDebtTab();
+      wrapBudgetSections();
+      wrapDebtSections();
+      wrapHolidaySections();
+    }catch(e){ console.warn(PATCH,e); }
+  }
+  function schedule(ms){ clearTimeout(timer); timer=setTimeout(run,ms||120); }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run); else run();
+  window.addEventListener('load',()=>{ run(); [250,800,1600].forEach(ms=>setTimeout(run,ms)); });
+  document.addEventListener('click',()=>schedule(160),true);
+  document.addEventListener('input',()=>schedule(180),true);
+  document.addEventListener('change',()=>schedule(180),true);
+  window.GrantOSBuild30DropdownSummaryCleanup={run};
+})();
+</script>
+
+
+
+<!-- GOS TESTER PRIORITY UPDATE: first-run onboarding -->
+<script id="gosTesterPriorityUpdateOnboarding">
+(function(){
+  'use strict';
+  if(window.__gosTesterPriorityOnboardingInstalled) return;
+  window.__gosTesterPriorityOnboardingInstalled = true;
+
+  const STORAGE_KEY = 'grant_os_test_build_first_run_onboarding_seen_v1';
+  const VERSION_LABEL = 'Test Build 3.0 - Tester Priority Update';
+
+  function ready(fn){
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn, {once:true});
+    else fn();
+  }
+
+  function applyTesterPriorityVersionLabel(){
+    try{ document.title = 'Grant OS ' + VERSION_LABEL; }catch(e){}
+    try{
+      const pill = document.querySelector('header .pill');
+      if(pill) pill.textContent = VERSION_LABEL;
+    }catch(e){}
+    try{
+      document.querySelectorAll('.version,.version-label,#versionLabel,#appVersion,[data-version]').forEach(function(el){
+        if(el && /Grant OS|Build|v\d|Tester|Test/i.test(el.textContent || '')) el.textContent = VERSION_LABEL;
+      });
+    }catch(e){}
+  }
+
+  function installStyles(){
+    if(document.getElementById('gosTesterPriorityOnboardingStyles')) return;
+    const style = document.createElement('style');
+    style.id = 'gosTesterPriorityOnboardingStyles';
+    style.textContent = `
+      .gos-tester-onboarding-backdrop{
+        position:fixed; inset:0; z-index:99980; display:flex; align-items:center; justify-content:center;
+        padding:18px; background:rgba(3,10,24,.72); backdrop-filter:blur(10px);
+      }
+      .gos-tester-onboarding-card{
+        width:min(520px, 96vw); max-height:88vh; overflow:auto; border-radius:22px;
+        background:linear-gradient(180deg,#101a31 0%,#071021 100%); color:#eef5ff;
+        box-shadow:0 24px 80px rgba(0,0,0,.45); border:1px solid rgba(255,255,255,.12);
+        padding:18px; font-family:inherit;
+      }
+      .gos-tester-onboarding-top{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px;}
+      .gos-tester-onboarding-kicker{font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:#9fb4d9; font-weight:800;}
+      .gos-tester-onboarding-count{font-size:12px; color:#c7d4ee; white-space:nowrap;}
+      .gos-tester-onboarding-title{font-size:22px; line-height:1.16; margin:8px 0 10px; font-weight:900;}
+      .gos-tester-onboarding-body{font-size:15px; line-height:1.5; color:#dbe7ff; margin:0 0 12px;}
+      .gos-tester-onboarding-list{margin:10px 0 0 0; padding:0; list-style:none; display:grid; gap:8px;}
+      .gos-tester-onboarding-list li{padding:10px 12px; border-radius:14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); color:#eef5ff;}
+      .gos-tester-onboarding-nav{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:16px;}
+      .gos-tester-onboarding-arrow,.gos-tester-onboarding-dismiss{
+        appearance:none; border:0; border-radius:14px; min-height:42px; padding:10px 14px; font-weight:800; cursor:pointer;
+      }
+      .gos-tester-onboarding-arrow{background:rgba(255,255,255,.08); color:#eef5ff; border:1px solid rgba(255,255,255,.12); min-width:54px;}
+      .gos-tester-onboarding-arrow:disabled{opacity:.35; cursor:default;}
+      .gos-tester-onboarding-dismiss{background:#eef5ff; color:#071021; flex:1;}
+      .gos-tester-onboarding-dots{display:flex; justify-content:center; gap:6px; margin-top:12px;}
+      .gos-tester-onboarding-dot{width:7px; height:7px; border-radius:99px; background:rgba(255,255,255,.22);}
+      .gos-tester-onboarding-dot.active{background:#eef5ff; width:18px;}
+      @media(max-width:520px){
+        .gos-tester-onboarding-card{padding:16px; border-radius:20px;}
+        .gos-tester-onboarding-title{font-size:20px;}
+        .gos-tester-onboarding-body{font-size:14px;}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  const slides = [
+    {
+      title:'1. Accounts',
+      body:'Start here. Add the bank accounts you want to track, then choose whether each account should include its overdraft buffer in Safe Spend.',
+      points:[
+        'Accounts is mainly for setting up the account names and overdraft rule.',
+        'If overdraft is not included, Safe Spend uses balance only.',
+        'If overdraft is included, the app can use the selected overdraft buffer when checking affordability.'
+      ]
+    },
+    {
+      title:'2. Budget Setup',
+      body:'Enter the core figures that drive the dashboard: wage, payday, weekly spend target, account balances, and monthly bills.',
+      points:[
+        'Your main regular update is account balance and overdraft used.',
+        'Bills repeat monthly until you change or remove them.',
+        'Cashflow protects bills still due before payday before showing what is left for living spend.'
+      ]
+    },
+    {
+      title:'3. Debt Tracker',
+      body:'Add debts, loans, BNPL and one-off payments here so Grant OS can include them in cashflow and priorities.',
+      points:[
+        'Use BNPL for buy-now-pay-later debts and one-off for short-term single debts.',
+        'Debt payments due before payday reduce the current living spend pot.',
+        'When a debt looks complete, the app can help you review or archive it.'
+      ]
+    },
+    {
+      title:'4. Holiday Pots',
+      body:'Use Holiday Pots for planned trips or savings goals so the app can show what still needs funding.',
+      points:[
+        'Add the target amount and what has already been saved.',
+        'The app can then highlight upcoming funding pressure.',
+        'This helps separate holiday or goal money from day-to-day living spend.'
+      ]
+    }
+  ];
+
+  function buildOnboarding(){
+    if(document.getElementById('gosTesterOnboarding')) return;
+    installStyles();
+    let index = 0;
+    const backdrop = document.createElement('div');
+    backdrop.id = 'gosTesterOnboarding';
+    backdrop.className = 'gos-tester-onboarding-backdrop';
+    backdrop.setAttribute('role','dialog');
+    backdrop.setAttribute('aria-modal','true');
+    backdrop.setAttribute('aria-labelledby','gosTesterOnboardingTitle');
+    backdrop.innerHTML = `
+      <div class="gos-tester-onboarding-card">
+        <div class="gos-tester-onboarding-top">
+          <div class="gos-tester-onboarding-kicker">Tester Priority Update</div>
+          <div class="gos-tester-onboarding-count" id="gosTesterOnboardingCount"></div>
+        </div>
+        <h2 class="gos-tester-onboarding-title" id="gosTesterOnboardingTitle"></h2>
+        <p class="gos-tester-onboarding-body" id="gosTesterOnboardingBody"></p>
+        <ul class="gos-tester-onboarding-list" id="gosTesterOnboardingList"></ul>
+        <div class="gos-tester-onboarding-dots" id="gosTesterOnboardingDots" aria-hidden="true"></div>
+        <div class="gos-tester-onboarding-nav">
+          <button type="button" class="gos-tester-onboarding-arrow" id="gosTesterOnboardingPrev" aria-label="Previous instruction">‹</button>
+          <button type="button" class="gos-tester-onboarding-dismiss" id="gosTesterOnboardingDismiss">Dismiss</button>
+          <button type="button" class="gos-tester-onboarding-arrow" id="gosTesterOnboardingNext" aria-label="Next instruction">›</button>
+        </div>
+      </div>`;
+    document.body.appendChild(backdrop);
+
+    const title = backdrop.querySelector('#gosTesterOnboardingTitle');
+    const body = backdrop.querySelector('#gosTesterOnboardingBody');
+    const list = backdrop.querySelector('#gosTesterOnboardingList');
+    const count = backdrop.querySelector('#gosTesterOnboardingCount');
+    const dots = backdrop.querySelector('#gosTesterOnboardingDots');
+    const prev = backdrop.querySelector('#gosTesterOnboardingPrev');
+    const next = backdrop.querySelector('#gosTesterOnboardingNext');
+    const dismiss = backdrop.querySelector('#gosTesterOnboardingDismiss');
+
+    function render(){
+      const slide = slides[index];
+      title.textContent = slide.title;
+      body.textContent = slide.body;
+      count.textContent = (index + 1) + ' of ' + slides.length;
+      list.innerHTML = slide.points.map(function(p){ return '<li>' + String(p).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}) + '</li>'; }).join('');
+      dots.innerHTML = slides.map(function(_,i){ return '<span class="gos-tester-onboarding-dot ' + (i === index ? 'active' : '') + '"></span>'; }).join('');
+      prev.disabled = index === 0;
+      next.disabled = index === slides.length - 1;
+      dismiss.textContent = index === slides.length - 1 ? 'Dismiss and start testing' : 'Dismiss';
+    }
+    function close(){
+      try{ localStorage.setItem(STORAGE_KEY, 'yes'); }catch(e){}
+      backdrop.remove();
+    }
+    prev.addEventListener('click', function(){ if(index > 0){ index--; render(); } });
+    next.addEventListener('click', function(){ if(index < slides.length - 1){ index++; render(); } });
+    dismiss.addEventListener('click', close);
+    backdrop.addEventListener('keydown', function(e){
+      if(e.key === 'Escape') close();
+      if(e.key === 'ArrowLeft' && index > 0){ index--; render(); }
+      if(e.key === 'ArrowRight' && index < slides.length - 1){ index++; render(); }
+    });
+    render();
+    try{ dismiss.focus(); }catch(e){}
+  }
+
+  ready(function(){
+    applyTesterPriorityVersionLabel();
+    try{ setTimeout(applyTesterPriorityVersionLabel, 250); setTimeout(applyTesterPriorityVersionLabel, 1200); }catch(e){}
+    let seen = false;
+    try{ seen = localStorage.getItem(STORAGE_KEY) === 'yes'; }catch(e){}
+    if(!seen){
+      setTimeout(buildOnboarding, 450);
+    }
+  });
 })();
 </script>
 
