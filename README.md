@@ -29,3 +29,6 @@ Upload the contents of this zip to the root of that repository. The expected Chr
 https://grantbulmer.github.io/Grant-OD-Tester/?v=tester-build-3-0-github-repo-input-stability-fix
 
 No app functions, calculations, layout, helper behaviour or onboarding logic were intentionally changed for this conversion.
+
+
+Patch: Bill input stability fix for Monthly Fixed Costs / Bills and Test Build 3.0 header label.

@@ -1,7 +1,7 @@
 {
-  "name": "Grant OS Tester Build 3.0",
+  "name": "Grant OS Test Build 3.0",
   "short_name": "Grant OS Test",
-  "start_url": "./?v=tester-build-3-0-github-repo-input-stability-fix",
+  "start_url": "./?v=tester-build-3-0-bill-input-stability-fix",
   "scope": "./",
   "display": "standalone",
   "background_color": "#071021",
