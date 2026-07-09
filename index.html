@@ -45,7 +45,7 @@ commercially without written permission from Grant Bulmer.
   html.gos-render-ready body{opacity:1;transition:opacity .14s ease-out;}
 </style>
 
-<title>Grant OS Test Build 3.0</title>
+<title>Grant OS Main Build 3.0</title>
 <style>
 :root{
   --bg:#071021;--panel:#1e2a38;--panel2:#111827;--border:#334155;--text:#f8fafc;
@@ -1274,19 +1274,12 @@ header .pill{vertical-align:middle;}
   @media(max-width:700px){#accounts .v283-setup-only-card .v25527-form-grid{grid-template-columns:1fr;}}
 </style>
 
-
-
-<style id="testerBuildCSS">
-  .tester-build-banner{margin:10px auto 0;max-width:1180px;padding:10px 14px;border-radius:14px;background:rgba(34,197,94,.16);border:1px solid rgba(34,197,94,.34);color:#dcfce7;line-height:1.45;font-size:13px;}
-  .tester-build-banner strong{color:#fff;}
-</style>
 </head>
 <body>
 <header>
-  <h1>Grant OS <span class="pill">Test Build 3.0</span></h1>
+  <h1>Grant OS <span class="pill">Main Build 3.0</span></h1>
   <div class="sub">Finance • Debt • Holidays • Relocation • Career</div>
 </header>
-<div class="tester-build-banner"><strong>Tester build:</strong> clean starter version with personal data removed. Enter your own wage, accounts, bills, debts and goals to test the app.</div>
 <main>
   <div class="tabs">
     <button class="tab active" onclick="UI.show('dashboard', this)">📊 Dashboard</button>
@@ -1343,13 +1336,13 @@ header .pill{vertical-align:middle;}
         <h3>Core Figures</h3>
         <table>
           <tr><td>Monthly wage</td><td><input id="wage" type="number"></td></tr>
-          <tr><td>Main Account balance</td><td><input id="firstDirectBalance" type="number"></td></tr>
-          <tr><td>Main Account overdraft used</td><td><input id="firstDirectOverdraft" type="number"></td></tr>
-          <tr><td>Spending Account balance</td><td><input id="monzoBalance" type="number"></td></tr>
-          <tr><td>Spending Account overdraft used</td><td><input id="monzoOverdraft" type="number"></td></tr>
-          <tr><td>Spending Account overdraft limit</td><td><input id="monzoOverdraftLimit" type="number"></td></tr>
-          <tr><td>Include Spending Account overdraft in spend?</td><td><select id="includeMonzoOverdraftForSpend"><option value="yes">Yes - include remaining Spending Account overdraft</option><option value="no">No - Spending Account balance only</option></select></td></tr>
-          <tr><td>Include Main Account overdraft in spend?</td><td><select id="includeFirstDirectOverdraftForSpend"><option value="no">No - Main Account balance only</option><option value="yes">Yes - include remaining Main Account overdraft</option></select></td></tr>
+          <tr><td>First Direct balance</td><td><input id="firstDirectBalance" type="number"></td></tr>
+          <tr><td>First Direct overdraft used</td><td><input id="firstDirectOverdraft" type="number"></td></tr>
+          <tr><td>Monzo balance</td><td><input id="monzoBalance" type="number"></td></tr>
+          <tr><td>Monzo overdraft used</td><td><input id="monzoOverdraft" type="number"></td></tr>
+          <tr><td>Monzo overdraft limit</td><td><input id="monzoOverdraftLimit" type="number"></td></tr>
+          <tr><td>Include Monzo overdraft in spend?</td><td><select id="includeMonzoOverdraftForSpend"><option value="yes">Yes - include remaining Monzo overdraft</option><option value="no">No - Monzo balance only</option></select></td></tr>
+          <tr><td>Include First Direct overdraft in spend?</td><td><select id="includeFirstDirectOverdraftForSpend"><option value="no">No - First Direct balance only</option><option value="yes">Yes - include remaining First Direct overdraft</option></select></td></tr>
           <tr><td>Weekly living budget</td><td><input id="weeklyBudget" type="number"></td></tr>
           <tr><td>Payday day of month</td><td><input id="payday" type="number"></td></tr>
           <tr><td>Emergency fund saved</td><td><input id="emergencyFund" type="number"></td></tr>
@@ -1360,7 +1353,7 @@ header .pill{vertical-align:middle;}
       <div class="card wide">
         <h3>Payday Update Mode</h3>
         <p class="note">Use this on the 26th before spending anything.</p>
-        <div class="step"><strong>Step 1:</strong> Update Main Account and Spending Account balances.</div>
+        <div class="step"><strong>Step 1:</strong> Update First Direct and Monzo balances.</div>
         <div class="step"><strong>Step 2:</strong> Update overdrafts used.</div>
         <div class="step"><strong>Step 3:</strong> Update emergency fund, debt and holiday pots if changed.</div>
         <div class="step"><strong>Step 4:</strong> Press save and return to Dashboard.</div>
@@ -1383,7 +1376,6 @@ header .pill{vertical-align:middle;}
         <table id="debtTable"></table>
         <button class="primary" onclick="App.saveAndRender()">Save debt figures</button> <button onclick="Debt.add()">Add debt</button>
       </div>
-      <div class="card wide"><h3>Priority Queue</h3><div id="priorityQueue"></div></div>
       <div class="card wide"><h3>Debt Progress</h3><div id="debtProgressList"></div></div>
       <div class="card full">
         <h3>Smarter Overpayment Simulator</h3>
@@ -1407,6 +1399,7 @@ header .pill{vertical-align:middle;}
         <button class="primary" onclick="App.saveAndRender()">Save holiday pots</button> <button onclick="Holidays.add()">Add holiday</button>
       </div>
       <div class="card full"><h3>Holiday Summary</h3><table id="holidayControlTable"></table></div>
+      <div class="card full" id="gosHolidayFundingCard"><h3>Holiday Funding</h3><div id="holidayFundingGraph"></div></div>
     </div>
   </section>
 
@@ -1417,10 +1410,6 @@ header .pill{vertical-align:middle;}
       <div class="card full">
         <h3>Insights & Graphs</h3>
         <p class="note">Simple visuals to show whether you are improving. These are estimates based on the figures currently entered in Grant OS.</p>
-      </div>
-      <div class="card full">
-        <h3>Financial Snapshot</h3>
-        <div id="financeHealthBreakdown" class="snapshot-grid"></div>
       </div>
       <div class="card wide">
         <h3>Debt Balance Forecast</h3>
@@ -1433,10 +1422,6 @@ header .pill{vertical-align:middle;}
       <div class="card wide">
         <h3>Emergency Fund Progress</h3>
         <div id="emergencyGraph"></div>
-      </div>
-      <div class="card wide">
-        <h3>Holiday Funding</h3>
-        <div id="holidayFundingGraph"></div>
       </div>
     </div>
   </section>
@@ -1498,34 +1483,37 @@ header .pill{vertical-align:middle;}
 
 <script>
 const Defaults = {
-  wage:0,
-  firstDirectBalance:0,
-  firstDirectOverdraft:0,
-  monzoBalance:0,
-  monzoOverdraft:0,
-  monzoOverdraftLimit:0,
-  includeMonzoOverdraftForSpend:"no",
-  firstDirectOverdraftLimit:0,
-  includeFirstDirectOverdraftForSpend:"no",
-  weeklyBudget:0,
-  payday:26,
-  emergencyFund:0,
-  emergencyTarget:0,
-  extraOverpayment:0,
-  overpayTarget:"Auto Priority",
-  fixed:[],
-  debts:[],
-  holidays:[],
-  thai:[],
-  nz:[],
-  jobs:[]
+  wage:2200, firstDirectBalance:0, firstDirectOverdraft:100, monzoBalance:0, monzoOverdraft:200,
+  monzoOverdraftLimit:200, includeMonzoOverdraftForSpend:"yes", firstDirectOverdraftLimit:650, includeFirstDirectOverdraftForSpend:"no", weeklyBudget:60, payday:26,
+  emergencyFund:0, emergencyTarget:1000, extraOverpayment:0, overpayTarget:"Auto Priority",
+  fixed:[
+    ["Admiral",485],["Lendable",154],["Oakbrook",125],["Currys",45],["Phone",80],["Electric to parents",80],
+    ["Perfect Pet",35],["Union",18],["Ionity",10],["Athletic",8],["Patreon",4.8],["Microsoft",1.99],
+    ["Prime",8.99],["Disney",5.99],["Monzo Max",17]
+  ],
+  debts:[
+    ["Admiral",7762,485,"Oct 2027","Regular","27-Oct-2027",4],
+    ["Lendable",1849,154,"Aug 2027","Regular","27-Aug-2027",3],
+    ["Oakbrook",742,125,"Jan 2027","Regular","27-Jan-2027",2],
+    ["Currys BNPL",440,0,"10 Sep 2026","One-off","10-Sep-2026",1],
+    ["Friend - Barcelona",600,50,"Flexible","Flexible","",5]
+  ],
+  holidays:[
+    ["Barcelona","Funded by friend loan",600,600,"11-Jul-2026"],
+    ["Turkey","Spending target",900,400,"27-Jul-2026"],
+    ["Amsterdam","Stag spending pot",800,0,"28-Oct-2026"],
+    ["Amsterdam flights","Due 28 Sept",330,0,"28-Sep-2026"]
+  ],
+  thai:[["Flights",800,0],["Visa/admin",300,0],["Initial accommodation",1500,0],["Emergency fund",3000,0]],
+  nz:[["Flights",1200,0],["Visa/admin",1000,0],["Initial accommodation",2500,0],["Emergency fund",5000,0]],
+  jobs:[["St Andrews","DT Technician","Applied","Thailand"],["NZ Councils","Maintenance Supervisor","Researching","New Zealand"]]
 };
-let state = JSON.parse(localStorage.getItem("grantOS_tester_build_v283")) || structuredClone(Defaults);
+let state = JSON.parse(localStorage.getItem("grantOS_v1")) || structuredClone(Defaults);
 const today = new Date();
 const money = n => "£" + Number(n||0).toLocaleString("en-GB",{maximumFractionDigits:2});
 
 const Data = {
-  save(){ localStorage.setItem("grantOS_tester_build_v283", JSON.stringify(state)); },
+  save(){ localStorage.setItem("grantOS_v1", JSON.stringify(state)); },
   resetDefaults(){ state = structuredClone(Defaults); this.save(); App.render(); },
   ensure(){
     const d=structuredClone(Defaults);
@@ -1599,19 +1587,19 @@ const Calc = {
   nextPriority(){
     const one=state.debts.filter(d=>this.debtType(d)==="One-off" && Number(d[1]||0)>0).sort((a,b)=>this.debtPriority(a)-this.debtPriority(b));
     if(one.length) return "Clear "+one[0][0];
-    if(this.holidayRemaining("Flight pot")>0) return "Pay Flight pot";
+    if(this.holidayRemaining("Amsterdam flights")>0) return "Pay Amsterdam flights";
     if(this.totalOverdraft()>0) return "Reduce overdraft reliance";
     if(Number(state.emergencyFund||0)<Number(state.emergencyTarget||1000)) return "Build emergency fund";
     return "Build relocation fund";
   },
   alerts(){
     const out=[];
-    const currys=this.debtBalance("BNPL item");
-    if(currys>0) out.push(["amber",`BNPL item still has ${money(currys)} remaining.`]);
-    const flights=this.holidayRemaining("Flight pot");
-    if(flights>0) out.push(["amber",`Flight pot still need ${money(flights)} ringfenced.`]);
+    const currys=this.debtBalance("Currys BNPL");
+    if(currys>0) out.push(["amber",`Currys BNPL still has ${money(currys)} remaining.`]);
+    const flights=this.holidayRemaining("Amsterdam flights");
+    if(flights>0) out.push(["amber",`Amsterdam flights still need ${money(flights)} ringfenced.`]);
     if(this.safeWeek()<Number(state.weeklyBudget||60)) out.push(["amber",`Safe weekly spend is ${money(this.safeWeek())}, below your usual ${money(state.weeklyBudget||60)} target.`]);
-    if(this.totalOverdraft()>0) out.push(["amber",`You are using ${money(this.totalOverdraft())} of overdraft across Main Account and Spending Account.`]);
+    if(this.totalOverdraft()>0) out.push(["amber",`You are using ${money(this.totalOverdraft())} of overdraft across First Direct and Monzo.`]);
     if(Number(state.emergencyFund||0)<Number(state.emergencyTarget||1000)) out.push(["amber",`Emergency fund is ${money(state.emergencyFund)} / ${money(state.emergencyTarget)}.`]);
     if(!out.length) out.push(["green","No immediate finance alerts. Keep following the weekly spend plan."]);
     return out;
@@ -1677,7 +1665,7 @@ const Dashboard = {
     this.forecast();
   },
   progress(){
-    const ams=Calc.holiday("Holiday pot");
+    const ams=Calc.holiday("Amsterdam");
     const amsPct=ams?Math.min(100,Number(ams[3]||0)/Math.max(Number(ams[2]||1),1)*100):0;
     const items=[
       ["Emergency fund", Number(state.emergencyFund||0)/Math.max(Number(state.emergencyTarget||1000),1)*100],
@@ -1693,9 +1681,9 @@ const Dashboard = {
     ["26 Jul 2026","26 Aug 2026","26 Sep 2026","26 Oct 2026","26 Nov 2026","26 Dec 2026","26 Jan 2027"].forEach((p,i)=>{
       bal+=Number(state.wage||0);
       let one=0,note="";
-      if(i===0){one=Calc.holidayRemaining("Holiday pot");note="Holiday pot remaining based on Holiday Pots";}
-      else if(i===1){one=Calc.debtMonthly("Friend")+Calc.debtBalance("BNPL item")+Calc.holidayRemaining("Flight pot");note="Friend + BNPL item + Flight pot";}
-      else if(i===2){one=Calc.debtMonthly("Friend")+Calc.holidayRemaining("Holiday pot");note="Friend + Holiday pot spend remaining";}
+      if(i===0){one=Calc.holidayRemaining("Turkey");note="Turkey remaining based on Holiday Pots";}
+      else if(i===1){one=Calc.debtMonthly("Friend")+Calc.debtBalance("Currys BNPL")+Calc.holidayRemaining("Amsterdam flights");note="Friend + Currys BNPL + Amsterdam flights";}
+      else if(i===2){one=Calc.debtMonthly("Friend")+Calc.holidayRemaining("Amsterdam");note="Friend + Amsterdam spend remaining";}
       else {one=Calc.debtMonthly("Friend");note="Friend repayment only; surplus can become emergency/relocation fund";}
       bal-=(fixed+one);
       rows.push([p,money(state.wage),money(fixed),money(one),money(bal),note]);
@@ -1750,7 +1738,7 @@ const Debt = {
     const items=[];
     const one=state.debts.filter(d=>Calc.debtType(d)==="One-off"&&Number(d[1]||0)>0).sort((a,b)=>Calc.debtPriority(a)-Calc.debtPriority(b));
     one.forEach(d=>items.push(["Clear "+d[0],money(d[1])+" due "+Calc.debtDue(d),Calc.debtPriority(d)]));
-    if(Calc.holidayRemaining("Flight pot")>0)items.push(["Pay Flight pot",money(Calc.holidayRemaining("Flight pot"))+" remaining",20]);
+    if(Calc.holidayRemaining("Amsterdam flights")>0)items.push(["Pay Amsterdam flights",money(Calc.holidayRemaining("Amsterdam flights"))+" remaining",20]);
     if(Calc.totalOverdraft()>0)items.push(["Reduce overdraft reliance",money(Calc.totalOverdraft())+" currently used",30]);
     state.debts.filter(d=>Calc.debtType(d)==="Flexible"&&Number(d[1]||0)>0).forEach(d=>items.push(["Repay "+d[0],money(d[1])+" flexible balance",40+Calc.debtPriority(d)]));
     if(Number(state.emergencyFund)<Number(state.emergencyTarget))items.push(["Build emergency fund",money(state.emergencyFund)+" / "+money(state.emergencyTarget),80]);
@@ -1810,8 +1798,8 @@ const Career = {
 
 const Settings = {
   exportData(){ const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="grant-os-v1-backup.json"; a.click(); },
-  restoreDefaults(){ if(confirm("Restore tester default values?")) Data.resetDefaults(); },
-  reset(){ if(confirm("Reset all Grant OS data?")){ localStorage.removeItem("grantOS_tester_build_v283"); state=structuredClone(Defaults); App.render(); } }
+  restoreDefaults(){ if(confirm("Restore Grant's default values?")) Data.resetDefaults(); },
+  reset(){ if(confirm("Reset all Grant OS data?")){ localStorage.removeItem("grantOS_v1"); state=structuredClone(Defaults); App.render(); } }
 };
 
 const Timeline = {
@@ -1984,7 +1972,7 @@ const Timeline = {
 };
 
 const HealthV21 = (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   function n(v){ const x=Number(String(v??'').replace(/[^0-9.-]/g,'')); return isNaN(x)?0:x; }
   function esc(v){ return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   function clamp(v,min,max){ return Math.max(min,Math.min(max,v)); }
@@ -1998,14 +1986,14 @@ const HealthV21 = (function(){
   function readStoredAccounts(){
     // Use localStorage first so Financial Health never reads a stale in-memory account cache.
     try{
-      const key=(window.AccountsUIV25527&&AccountsUIV25527.storeKey)||'grantOS_tester_accounts_build_v283';
+      const key=(window.AccountsUIV25527&&AccountsUIV25527.storeKey)||'grantOS.accounts.v2554';
       const raw=JSON.parse(localStorage.getItem(key)||'[]');
       if(Array.isArray(raw)&&raw.length) return raw.filter(Boolean);
     }catch(e){}
     try{ if(window.AccountsUIV25527&&AccountsUIV25527.accounts){ const a=AccountsUIV25527.accounts(); if(Array.isArray(a)&&a.length) return a.filter(Boolean); } }catch(e){}
     try{ return [
-      {name:'Main Account',type:'Current',balance:n(state.firstDirectBalance)-n(state.firstDirectOverdraft),limit:n(state.firstDirectOverdraftLimit||650),includeOverdraftForSpend:state.includeFirstDirectOverdraftForSpend||'no'},
-      {name:'Spending Account',type:'Current',balance:n(state.monzoBalance)-n(state.monzoOverdraft),limit:n(state.monzoOverdraftLimit||200),includeOverdraftForSpend:state.includeMonzoOverdraftForSpend||'yes'}
+      {name:'First Direct',type:'Current',balance:n(state.firstDirectBalance)-n(state.firstDirectOverdraft),limit:n(state.firstDirectOverdraftLimit||650),includeOverdraftForSpend:state.includeFirstDirectOverdraftForSpend||'no'},
+      {name:'Monzo',type:'Current',balance:n(state.monzoBalance)-n(state.monzoOverdraft),limit:n(state.monzoOverdraftLimit||200),includeOverdraftForSpend:state.includeMonzoOverdraftForSpend||'yes'}
     ]; }catch(e){ return []; }
   }
   function val(id){ const el=document.getElementById(id); return el&&el.value!==undefined?el.value:null; }
@@ -2287,7 +2275,7 @@ const SnapshotV24 = {
     const emergencyPct = this.pct(emergency, emergencyTarget);
     const cards = [
       {title:"Overdraft",value:`${money(overdraft)} used`,detail:`${Math.round(odPct)}% of ${money(odLimit)} limit`,pct:odPct,cls:overdraft<=0?"good":odPct>80?"risk":"warning"},
-      {title:"BNPL",value:`${money(bnpl)} remaining`,detail:bnpl<=0?"Cleared":"BNPL item still to clear",pct:bnpl<=0?100:Math.max(0,100-this.pct(bnpl,440)),cls:bnpl<=0?"good":"warning"},
+      {title:"BNPL",value:`${money(bnpl)} remaining`,detail:bnpl<=0?"Cleared":"Currys BNPL still to clear",pct:bnpl<=0?100:Math.max(0,100-this.pct(bnpl,440)),cls:bnpl<=0?"good":"warning"},
       {title:"Emergency fund",value:`${money(emergency)} saved`,detail:`${Math.round(emergencyPct)}% of ${money(emergencyTarget)} target`,pct:emergencyPct,cls:emergency>=emergencyTarget?"good":"warning"},
       {title:"Bank position",value:money(bank),detail:bank>=0?"Positive overall position":"Current overall position",pct:bank>=0?100:Math.max(0,100+(bank/1000)*100),cls:bank>=0?"good":"warning"},
       {title:"Holiday funding",value:`${Math.round(holidayPct)}% funded`,detail:`${money(holidaySaved)} / ${money(holidayTarget)}`,pct:holidayPct,cls:holidayPct>=100?"good":"warning"},
@@ -2299,8 +2287,8 @@ const SnapshotV24 = {
 };
 
 const ForecastRangeV24 = {
-  get(){ return Number(localStorage.getItem("grantOSTesterForecastMonths_build_v283") || 6); },
-  set(m){ localStorage.setItem("grantOSTesterForecastMonths_build_v283", String(m)); this.renderToggle(); if(ForecastV21) ForecastV21.renderForecastTable(); if(GraphsV21) GraphsV21.render(); },
+  get(){ return Number(localStorage.getItem("grantOSForecastMonths") || 6); },
+  set(m){ localStorage.setItem("grantOSForecastMonths", String(m)); this.renderToggle(); if(ForecastV21) ForecastV21.renderForecastTable(); if(GraphsV21) GraphsV21.render(); },
   renderToggle(){
     const el=document.getElementById("forecastRangeToggle");
     if(!el) return;
@@ -2916,15 +2904,15 @@ const DueDateLiveGraphFixV251 = {
 DueDateLiveGraphFixV251.patch();
 
 const AccountSyncV25516 = {
-  accountStoreKey:"grantOS_tester_accounts_build_v283",
+  accountStoreKey:"grantOS.accounts.v2554",
   readAccounts(){
     try{
       const data=JSON.parse(localStorage.getItem(this.accountStoreKey)||"[]");
       if(Array.isArray(data) && data.length) return data;
     }catch(e){}
     return [
-      {name:"Main Account",type:"Current",balance:Number(state.firstDirectBalance||0)-Number(state.firstDirectOverdraft||0),limit:Number(state.firstDirectOverdraftLimit||650)},
-      {name:"Spending Account",type:"Current",balance:Number(state.monzoBalance||0)-Number(state.monzoOverdraft||0),limit:Number(state.monzoOverdraftLimit||200)}
+      {name:"First Direct",type:"Current",balance:Number(state.firstDirectBalance||0)-Number(state.firstDirectOverdraft||0),limit:Number(state.firstDirectOverdraftLimit||650)},
+      {name:"Monzo",type:"Current",balance:Number(state.monzoBalance||0)-Number(state.monzoOverdraft||0),limit:Number(state.monzoOverdraftLimit||200)}
     ];
   },
   writeAccounts(accounts){ localStorage.setItem(this.accountStoreKey,JSON.stringify(accounts)); },
@@ -2932,10 +2920,10 @@ const AccountSyncV25516 = {
   splitBalance(balance){ const b=Number(balance||0); return {balance:Math.max(0,b), overdraft:Math.max(0,-b)}; },
   syncAccountsToState(){
     const accounts=this.readAccounts();
-    let fd=this.find(accounts,"Main Account");
-    let monzo=this.find(accounts,"Spending Account");
-    if(!fd){ fd={name:"Main Account",type:"Current",balance:Number(state.firstDirectBalance||0)-Number(state.firstDirectOverdraft||0),limit:Number(state.firstDirectOverdraftLimit||650)}; accounts.unshift(fd); }
-    if(!monzo){ monzo={name:"Spending Account",type:"Current",balance:Number(state.monzoBalance||0)-Number(state.monzoOverdraft||0),limit:Number(state.monzoOverdraftLimit||200)}; accounts.push(monzo); }
+    let fd=this.find(accounts,"First Direct");
+    let monzo=this.find(accounts,"Monzo");
+    if(!fd){ fd={name:"First Direct",type:"Current",balance:Number(state.firstDirectBalance||0)-Number(state.firstDirectOverdraft||0),limit:Number(state.firstDirectOverdraftLimit||650)}; accounts.unshift(fd); }
+    if(!monzo){ monzo={name:"Monzo",type:"Current",balance:Number(state.monzoBalance||0)-Number(state.monzoOverdraft||0),limit:Number(state.monzoOverdraftLimit||200)}; accounts.push(monzo); }
     const fdSplit=this.splitBalance(fd.balance);
     const monzoSplit=this.splitBalance(monzo.balance);
     state.firstDirectBalance=fdSplit.balance;
@@ -2948,10 +2936,10 @@ const AccountSyncV25516 = {
   },
   syncStateToAccounts(){
     const accounts=this.readAccounts();
-    let fd=this.find(accounts,"Main Account");
-    let monzo=this.find(accounts,"Spending Account");
-    if(!fd){fd={name:"Main Account",type:"Current",balance:0,limit:650};accounts.unshift(fd);}
-    if(!monzo){monzo={name:"Spending Account",type:"Current",balance:0,limit:200};accounts.push(monzo);}
+    let fd=this.find(accounts,"First Direct");
+    let monzo=this.find(accounts,"Monzo");
+    if(!fd){fd={name:"First Direct",type:"Current",balance:0,limit:650};accounts.unshift(fd);}
+    if(!monzo){monzo={name:"Monzo",type:"Current",balance:0,limit:200};accounts.push(monzo);}
     fd.balance=Number(state.firstDirectBalance||0)-Number(state.firstDirectOverdraft||0);
     fd.limit=Number(state.firstDirectOverdraftLimit||fd.limit||650);
     monzo.balance=Number(state.monzoBalance||0)-Number(state.monzoOverdraft||0);
@@ -2961,27 +2949,27 @@ const AccountSyncV25516 = {
 };
 
 const AccountsUIV25527 = {
-  storeKey:"grantOS_tester_accounts_build_v283",
+  storeKey:"grantOS.accounts.v2554",
   defaults(){
     return [
-      {name:"Main Account",type:"Current",balance:Number(state.firstDirectBalance||0)-Number(state.firstDirectOverdraft||0),limit:Number(state.firstDirectOverdraftLimit||650)},
-      {name:"Spending Account",type:"Current",balance:Number(state.monzoBalance||0)-Number(state.monzoOverdraft||0),limit:Number(state.monzoOverdraftLimit||200)}
+      {name:"First Direct",type:"Current",balance:Number(state.firstDirectBalance||0)-Number(state.firstDirectOverdraft||0),limit:Number(state.firstDirectOverdraftLimit||650)},
+      {name:"Monzo",type:"Current",balance:Number(state.monzoBalance||0)-Number(state.monzoOverdraft||0),limit:Number(state.monzoOverdraftLimit||200)}
     ];
   },
   accounts(){
     let data=[];
     try{ data=JSON.parse(localStorage.getItem(this.storeKey)||"[]"); }catch(e){ data=[]; }
     if(!Array.isArray(data) || !data.length) data=this.defaults();
-    if(!data.find(a=>/(?:main\s*account|first\s*direct)/i.test(a.name||""))) data.unshift(this.defaults()[0]);
-    if(!data.find(a=>/(?:spending\s*account|monzo)/i.test(a.name||""))) data.push(this.defaults()[1]);
+    if(!data.find(a=>/first\s*direct/i.test(a.name||""))) data.unshift(this.defaults()[0]);
+    if(!data.find(a=>/monzo/i.test(a.name||""))) data.push(this.defaults()[1]);
     localStorage.setItem(this.storeKey,JSON.stringify(data));
     return data;
   },
   find(accounts,name){ return accounts.find(a=>String(a.name||"").toLowerCase()===name.toLowerCase()); },
   split(balance){ const b=Number(balance||0); return {balance:Math.max(0,b),overdraft:Math.max(0,-b)}; },
   syncToState(accounts=this.accounts()){
-    const fd=this.find(accounts,"Main Account");
-    const monzo=this.find(accounts,"Spending Account");
+    const fd=this.find(accounts,"First Direct");
+    const monzo=this.find(accounts,"Monzo");
     if(fd){
       const s=this.split(fd.balance);
       state.firstDirectBalance=s.balance;
@@ -3010,16 +2998,16 @@ const AccountsUIV25527 = {
   },
   selectedOverdraftBuffer(accounts){
     let total=0;
-    const fd=this.find(accounts,"Main Account");
-    const monzo=this.find(accounts,"Spending Account");
+    const fd=this.find(accounts,"First Direct");
+    const monzo=this.find(accounts,"Monzo");
     if(fd && state.includeFirstDirectOverdraftForSpend==="yes") total += this.overdraftRemaining(fd);
     if(monzo && state.includeMonzoOverdraftForSpend==="yes") total += this.overdraftRemaining(monzo);
     return total;
   },
   availableSpend(accounts){
     let total=0;
-    const fd=this.find(accounts,"Main Account");
-    const monzo=this.find(accounts,"Spending Account");
+    const fd=this.find(accounts,"First Direct");
+    const monzo=this.find(accounts,"Monzo");
     if(fd){
       const bal=Number(fd.balance||0);
       const rem=this.overdraftRemaining(fd);
@@ -3031,7 +3019,7 @@ const AccountsUIV25527 = {
       total += bal + (state.includeMonzoOverdraftForSpend==="yes" ? rem : 0);
     }
     accounts.forEach(a=>{
-      if(!/(?:main\s*account|first\s*direct)/i.test(a.name||"") && !/(?:spending\s*account|monzo)/i.test(a.name||"")) total += Number(a.balance||0);
+      if(!/first\s*direct/i.test(a.name||"") && !/monzo/i.test(a.name||"")) total += Number(a.balance||0);
     });
     return total;
   },
@@ -3381,7 +3369,7 @@ StableInputV254.patch();
         var bal=Number(a.balance||0), limit=Number(a.limit||0);
         var remaining=Math.max(0,limit+Math.min(0,bal));
         var name=String(a.name||'').toLowerCase();
-        var included=(a.includeOverdraftForSpend==='yes') || (/(?:spending\s*account|monzo)/.test(name) && state.includeMonzoOverdraftForSpend==='yes') || (/(?:main\s*account|first\s*direct)/.test(name) && state.includeFirstDirectOverdraftForSpend==='yes');
+        var included=(a.includeOverdraftForSpend==='yes') || (/monzo/.test(name) && state.includeMonzoOverdraftForSpend==='yes') || (/first\s*direct/.test(name) && state.includeFirstDirectOverdraftForSpend==='yes');
         var badges=[];
         if(bal<0) badges.push({text:'Overdraft active',type:'red'});
         if(limit>0 && included) badges.push({text:'Overdraft included',type:'amber'});
@@ -3416,13 +3404,13 @@ StableInputV254.patch();
 <script>
 /* v2.5.5.32 dynamic accounts linked into Budget Setup - max 5 */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   const MAX_ACCOUNTS=5;
 
   function num(v){ return Number(v||0); }
   function normName(v){ return String(v||'').trim(); }
-  function isFD(name){ return /(?:main\s*account|first\s*direct)/i.test(String(name||'')); }
-  function isMonzo(name){ return /(?:spending\s*account|monzo)/i.test(String(name||'')); }
+  function isFD(name){ return /first\s*direct/i.test(String(name||'')); }
+  function isMonzo(name){ return /monzo/i.test(String(name||'')); }
   function splitNet(balance){ const b=num(balance); return {balance:Math.max(0,b), overdraft:Math.max(0,-b)}; }
   function remainingOD(a){ return Math.max(0,num(a.limit)+Math.min(0,num(a.balance))); }
   function includeFlagFor(a){
@@ -3443,11 +3431,11 @@ StableInputV254.patch();
       includeOverdraftForSpend:(a.includeOverdraftForSpend==='yes'||a.includeOverdraftForSpend==='no')?a.includeOverdraftForSpend:undefined
     }));
     const defaults=(typeof AccountsUIV25527!=='undefined'&&AccountsUIV25527.defaults)?AccountsUIV25527.defaults():[
-      {name:'Main Account',type:'Current',balance:num(state.firstDirectBalance)-num(state.firstDirectOverdraft),limit:num(state.firstDirectOverdraftLimit||650)},
-      {name:'Spending Account',type:'Current',balance:num(state.monzoBalance)-num(state.monzoOverdraft),limit:num(state.monzoOverdraftLimit||200)}
+      {name:'First Direct',type:'Current',balance:num(state.firstDirectBalance)-num(state.firstDirectOverdraft),limit:num(state.firstDirectOverdraftLimit||650)},
+      {name:'Monzo',type:'Current',balance:num(state.monzoBalance)-num(state.monzoOverdraft),limit:num(state.monzoOverdraftLimit||200)}
     ];
     // v2.8.3 account/budget cleanup: only seed defaults when no accounts exist.
-    // Do not force Main Account/Spending Account back in after the user renames or removes them.
+    // Do not force First Direct/Monzo back in after the user renames or removes them.
     if(!out.length) out=defaults.map(a=>({...a}));
     out=out.slice(0,MAX_ACCOUNTS);
     out.forEach(a=>{ a.includeOverdraftForSpend=includeFlagFor(a); });
@@ -3465,7 +3453,7 @@ StableInputV254.patch();
   }
   function writeAccounts(accounts){
     const data=normalizeAccounts(accounts);
-    try{ localStorage.setItem((typeof AccountsUIV25527!=='undefined'&&AccountsUIV25527.storeKey)||'grantOS_tester_accounts_build_v283',JSON.stringify(data)); }catch(e){}
+    try{ localStorage.setItem((typeof AccountsUIV25527!=='undefined'&&AccountsUIV25527.storeKey)||'grantOS.accounts.v2554',JSON.stringify(data)); }catch(e){}
     syncLegacyState(data);
     try{ Data.save(); }catch(e){}
     return data;
@@ -3513,7 +3501,7 @@ StableInputV254.patch();
     grid.insertBefore(card,fixed||null);
   }
   function hideLegacyRows(){
-    const labels=['Main Account balance','Main Account overdraft used','Spending Account balance','Spending Account overdraft used','Spending Account overdraft limit','Include Spending Account overdraft in spend?','Include Main Account overdraft in spend?'];
+    const labels=['First Direct balance','First Direct overdraft used','Monzo balance','Monzo overdraft used','Monzo overdraft limit','Include Monzo overdraft in spend?','Include First Direct overdraft in spend?'];
     labels.forEach(label=>{
       document.querySelectorAll('#budget table tr').forEach(tr=>{
         const txt=(tr.cells&&tr.cells[0])?tr.cells[0].textContent.trim():'';
@@ -3798,7 +3786,7 @@ StableInputV254.patch();
 <script>
 /* v2.6 Dashboard Clarity Pass */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   function moneySafe(v){ try{return money(v);}catch(e){return '£'+Math.round(Number(v||0)).toLocaleString('en-GB');} }
   function num(v){ return Number(v||0); }
   function badgeHtml(b){ return '<span class="v25530-badge '+(b.type||'blue')+'">'+b.text+'</span>'; }
@@ -3851,7 +3839,7 @@ StableInputV254.patch();
     try{
       var one=(state.debts||[]).filter(function(d){return Calc.debtType(d)==='One-off' && num(d[1])>0;}).sort(function(a,b){return Calc.debtPriority(a)-Calc.debtPriority(b);});
       if(one.length) return {title:'Clear '+one[0][0], reason:'Highest-priority one-off debt. Clearing it removes a short-term pressure point and can improve your finance health score.', badge:'Debt priority'};
-      if(Calc.holidayRemaining('Flight pot')>0) return {title:'Pay Flight pot', reason:'This is still unfunded/ringfenced and sits in your immediate alerts.', badge:'Funding priority'};
+      if(Calc.holidayRemaining('Amsterdam flights')>0) return {title:'Pay Amsterdam flights', reason:'This is still unfunded/ringfenced and sits in your immediate alerts.', badge:'Funding priority'};
       if((Calc.totalOverdraft?Calc.totalOverdraft():0)>0) return {title:'Reduce overdraft reliance', reason:'This reduces interest/risk and improves your net bank position.', badge:'Overdraft priority'};
       if(num(state.emergencyFund)<num(state.emergencyTarget||1000)) return {title:'Build emergency fund', reason:'Your emergency fund is below target, so spare money should strengthen your safety buffer.', badge:'Safety buffer'};
       return {title:'Build relocation fund', reason:'Debt and emergency priorities are covered, so surplus can move toward longer-term goals.', badge:'Long-term goal'};
@@ -3864,10 +3852,10 @@ StableInputV254.patch();
     if(!window.Calc || Calc.__v26Clarity) return;
     Calc.alerts=function(){
       var out=[];
-      var currys=this.debtBalance?this.debtBalance('BNPL item'):0;
-      if(currys>0) out.push(actionAlert('amber','Clear BNPL item','Remaining: '+moneySafe(currys),'removes BNPL pressure and can lift your finance health score.'));
-      var flights=this.holidayRemaining?this.holidayRemaining('Flight pot'):0;
-      if(flights>0) out.push(actionAlert('amber','Ringfence Flight pot','Still needed: '+moneySafe(flights),'keeps the holiday cost covered before the due date.'));
+      var currys=this.debtBalance?this.debtBalance('Currys BNPL'):0;
+      if(currys>0) out.push(actionAlert('amber','Clear Currys BNPL','Remaining: '+moneySafe(currys),'removes BNPL pressure and can lift your finance health score.'));
+      var flights=this.holidayRemaining?this.holidayRemaining('Amsterdam flights'):0;
+      if(flights>0) out.push(actionAlert('amber','Ringfence Amsterdam flights','Still needed: '+moneySafe(flights),'keeps the holiday cost covered before the due date.'));
       var safeW=this.safeWeek?this.safeWeek():0, weekly=num(state.weeklyBudget||60);
       if(safeW<weekly) out.push(actionAlert('amber','Protect weekly spend','Safe week: '+moneySafe(safeW)+' / target '+moneySafe(weekly),'spending above this risks pressure before payday.'));
       var od=this.totalOverdraft?this.totalOverdraft():0;
@@ -3935,21 +3923,21 @@ StableInputV254.patch();
 <script>
 /* v2.6.1 Dashboard layout + safe-spend fix */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   function num(v){ return Number(v||0); }
   function moneySafe(n){ try{return money(n);}catch(e){ return '£'+num(n).toLocaleString('en-GB',{maximumFractionDigits:2}); } }
   function accountList(){
     try{ if(window.AccountsUIV25527 && AccountsUIV25527.accounts) return AccountsUIV25527.accounts().filter(Boolean); }catch(e){}
     try{ if(window.Calc && Calc.accountList) return Calc.accountList().filter(Boolean); }catch(e){}
     return [
-      {name:'Main Account', balance:num(state.firstDirectBalance)-num(state.firstDirectOverdraft), limit:num(state.firstDirectOverdraftLimit||650), includeOverdraftForSpend:state.includeFirstDirectOverdraftForSpend||'no'},
-      {name:'Spending Account', balance:num(state.monzoBalance)-num(state.monzoOverdraft), limit:num(state.monzoOverdraftLimit||200), includeOverdraftForSpend:state.includeMonzoOverdraftForSpend||'yes'}
+      {name:'First Direct', balance:num(state.firstDirectBalance)-num(state.firstDirectOverdraft), limit:num(state.firstDirectOverdraftLimit||650), includeOverdraftForSpend:state.includeFirstDirectOverdraftForSpend||'no'},
+      {name:'Monzo', balance:num(state.monzoBalance)-num(state.monzoOverdraft), limit:num(state.monzoOverdraftLimit||200), includeOverdraftForSpend:state.includeMonzoOverdraftForSpend||'yes'}
     ];
   }
   function includeFlag(a){
     if(a && (a.includeOverdraftForSpend==='yes' || a.includeOverdraftForSpend==='no')) return a.includeOverdraftForSpend;
     const name=String((a&&a.name)||'').toLowerCase();
-    if(/(?:spending\s*account|monzo)/.test(name)) return state.includeMonzoOverdraftForSpend||'no';
+    if(name.includes('monzo')) return state.includeMonzoOverdraftForSpend||'no';
     if(name.includes('first direct')) return state.includeFirstDirectOverdraftForSpend||'no';
     return 'no';
   }
@@ -4066,14 +4054,14 @@ StableInputV254.patch();
    used by the Accounts and Budget tabs. Uses lexical globals directly rather than window.*
    because this app defines core modules with const, so they are not attached to window. */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   function num(v){ return Number(v||0); }
   function fmtMoney(v){
     try{ return money(v); }
     catch(e){ return '£'+num(v).toLocaleString('en-GB',{maximumFractionDigits:2}); }
   }
-  function isFD(name){ return /(?:main\s*account|first\s*direct)/i.test(String(name||'')); }
-  function isMonzo(name){ return /(?:spending\s*account|monzo)/i.test(String(name||'')); }
+  function isFD(name){ return /first\s*direct/i.test(String(name||'')); }
+  function isMonzo(name){ return /monzo/i.test(String(name||'')); }
   function readAccountsSafe(){
     try{
       if(typeof AccountsUIV25527!=='undefined' && AccountsUIV25527.accounts){
@@ -4088,8 +4076,8 @@ StableInputV254.patch();
       }
     }catch(e){}
     return [
-      {name:'Main Account',balance:num(state.firstDirectBalance)-num(state.firstDirectOverdraft),limit:num(state.firstDirectOverdraftLimit||650),includeOverdraftForSpend:state.includeFirstDirectOverdraftForSpend||'no'},
-      {name:'Spending Account',balance:num(state.monzoBalance)-num(state.monzoOverdraft),limit:num(state.monzoOverdraftLimit||200),includeOverdraftForSpend:state.includeMonzoOverdraftForSpend||'yes'}
+      {name:'First Direct',balance:num(state.firstDirectBalance)-num(state.firstDirectOverdraft),limit:num(state.firstDirectOverdraftLimit||650),includeOverdraftForSpend:state.includeFirstDirectOverdraftForSpend||'no'},
+      {name:'Monzo',balance:num(state.monzoBalance)-num(state.monzoOverdraft),limit:num(state.monzoOverdraftLimit||200),includeOverdraftForSpend:state.includeMonzoOverdraftForSpend||'yes'}
     ];
   }
   function includeFlag(account){
@@ -4210,7 +4198,7 @@ StableInputV254.patch();
 /* v2.6.4 Dashboard Card Order
    Moves Safe To Spend cards into the first row and moves bank/overdraft cards below Next Priority. */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   function updateVersion(){
     try{ document.title='Grant OS '+VERSION; }catch(e){}
     try{ const pill=document.querySelector('header .pill'); if(pill) pill.textContent=VERSION; }catch(e){}
@@ -4257,7 +4245,7 @@ StableInputV254.patch();
    the original page-load date. If the app is left open overnight and no money is
    spent, the daily/weekly safe-spend allowance rolls forward automatically. */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   const MS_DAY=24*60*60*1000;
   let lastDateKey='';
   function num(v){ return Number(v||0); }
@@ -4351,7 +4339,7 @@ StableInputV254.patch();
 <script>
 /* v2.7 Responsive Device Layout Pass runtime tidy */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   function updateVersion(){
     try{ document.title='Grant OS '+VERSION; }catch(e){}
     try{ const pill=document.querySelector('header .pill'); if(pill) pill.textContent=VERSION; }catch(e){}
@@ -4519,7 +4507,7 @@ StableInputV254.patch();
 <script>
 /* v2.7.2 Mobile Form Access Fix runtime */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   const TABLES=['fixedCostsTable','debtTable','holidayTable','holidayControlTable'];
   function updateVersion(){
     try{ document.title='Grant OS '+VERSION; }catch(e){}
@@ -4676,7 +4664,7 @@ StableInputV254.patch();
 <script>
 /* v2.7.3 Mobile Full Form Fix + Fixed Cost Dates runtime */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   const TABLES=['dynamicBudgetAccountsTable','fixedCostsTable','debtTable','holidayTable','holidayControlTable'];
   function updateVersion(){
     try{ document.title='Grant OS '+VERSION; }catch(e){}
@@ -4886,7 +4874,7 @@ StableInputV254.patch();
    Creates live mobile editor cards for Budget linked accounts, fixed costs, debts and holidays.
    Desktop/foldable keeps the existing table layout. */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   const MAX_ACCOUNTS=5;
   const tableIds=['dynamicBudgetAccountsTable','fixedCostsTable','debtTable','holidayTable','holidayControlTable'];
   const isPhone=()=>window.matchMedia && window.matchMedia('(max-width:640px)').matches;
@@ -4905,13 +4893,13 @@ StableInputV254.patch();
   function accountIncludeFlag(a){
     const name=String(a&&a.name||'').toLowerCase();
     if(a && (a.includeOverdraftForSpend==='yes' || a.includeOverdraftForSpend==='no')) return a.includeOverdraftForSpend;
-    if(/(?:main\s*account|first\s*direct)/.test(name)) return state.includeFirstDirectOverdraftForSpend||'no';
-    if(/(?:spending\s*account|monzo)/.test(name)) return state.includeMonzoOverdraftForSpend||'no';
+    if(/first\s*direct/.test(name)) return state.includeFirstDirectOverdraftForSpend||'no';
+    if(/monzo/.test(name)) return state.includeMonzoOverdraftForSpend||'no';
     return 'no';
   }
   function accountWrite(accounts){
     try{ if(window.AccountsUIV25527 && AccountsUIV25527.write) AccountsUIV25527.write(accounts); }
-    catch(e){ try{ localStorage.setItem('grantOS_tester_accounts_build_v283',JSON.stringify(accounts)); Data.save(); }catch(err){} }
+    catch(e){ try{ localStorage.setItem('grantOS.accounts.v2554',JSON.stringify(accounts)); Data.save(); }catch(err){} }
   }
   function accountsRead(){
     try{ if(window.AccountsUIV25527 && AccountsUIV25527.accounts) return AccountsUIV25527.accounts().slice(0,MAX_ACCOUNTS); }catch(e){}
@@ -5017,7 +5005,7 @@ StableInputV254.patch();
 /* v2.7.5 Mobile Add/Remove Fix
    Keeps the successful v2.7.4 mobile card layout, but makes Add/Remove update the mobile cards immediately. */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   function updateVersion(){
     try{ document.title='Grant OS '+VERSION; }catch(e){}
     try{ const pill=document.querySelector('header .pill'); if(pill) pill.textContent=VERSION; }catch(e){}
@@ -5104,7 +5092,7 @@ StableInputV254.patch();
    Debt Tracker is the master source for debt balances/repayments.
    Safe-spend/forecast totals still include debt repayments via Calc.totalFixed(). */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   function n(v){ const x=Number(String(v??'').replace(/[^0-9.-]/g,'')); return isNaN(x)?0:x; }
   function esc(v){ return String(v??'').replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
   function moneySafe(v){ try{return money(v);}catch(e){return '£'+Number(v||0).toLocaleString('en-GB',{maximumFractionDigits:2});} }
@@ -5272,7 +5260,7 @@ StableInputV254.patch();
    Adds remove controls for normal bills in Budget > Monthly Fixed Costs / Bills.
    Keeps Debt Tracker as the master place for debt repayments. */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   function n(v){ const x=Number(String(v??'').replace(/[^0-9.-]/g,'')); return isNaN(x)?0:x; }
   function esc(v){ return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
   function updateVersion(){
@@ -5418,7 +5406,7 @@ StableInputV254.patch();
 <script>
 /* v2.7.10 version label only */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   function updateVersion(){
     try{ document.title='Grant OS '+VERSION; }catch(e){}
     try{ const pill=document.querySelector('header .pill'); if(pill) pill.textContent=VERSION; }catch(e){}
@@ -5564,7 +5552,7 @@ StableInputV254.patch();
    Baseline guard only: keeps the visible version stable after older patch layers run.
    No calculation, layout, or data-model changes are made here. */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   window.GRANT_OS_BASELINE_VERSION=VERSION;
   function setStableVersion(){
     try{ document.title='Grant OS '+VERSION; }catch(e){}
@@ -5584,7 +5572,7 @@ StableInputV254.patch();
 /* v2.8 Priority 2: Collapsible Guidance + Calculation Breakdown Panels
    Adds explainers/help panels only. Does not change calculations, saving, or layout logic. */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   function n(v){ const x=Number(String(v??'').replace(/[^0-9.-]/g,'')); return isNaN(x)?0:x; }
   function clamp(v,min,max){ return Math.max(min,Math.min(max,v)); }
   function esc(v){ return String(v??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
@@ -5622,16 +5610,16 @@ StableInputV254.patch();
   function accounts(){
     try{ if(typeof AccountsUIV25527!=='undefined' && AccountsUIV25527.accounts){ const a=AccountsUIV25527.accounts(); if(Array.isArray(a)&&a.length) return a.filter(Boolean); } }catch(e){}
     try{ return [
-      {name:'Main Account',balance:n(state.firstDirectBalance)-n(state.firstDirectOverdraft),limit:n(state.firstDirectOverdraftLimit||650),includeOverdraftForSpend:state.includeFirstDirectOverdraftForSpend||'no'},
-      {name:'Spending Account',balance:n(state.monzoBalance)-n(state.monzoOverdraft),limit:n(state.monzoOverdraftLimit||200),includeOverdraftForSpend:state.includeMonzoOverdraftForSpend||'yes'}
+      {name:'First Direct',balance:n(state.firstDirectBalance)-n(state.firstDirectOverdraft),limit:n(state.firstDirectOverdraftLimit||650),includeOverdraftForSpend:state.includeFirstDirectOverdraftForSpend||'no'},
+      {name:'Monzo',balance:n(state.monzoBalance)-n(state.monzoOverdraft),limit:n(state.monzoOverdraftLimit||200),includeOverdraftForSpend:state.includeMonzoOverdraftForSpend||'yes'}
     ]; }catch(e){ return []; }
   }
   function includeFlag(a){
     if(a&&(a.includeOverdraftForSpend==='yes'||a.includeOverdraftForSpend==='no')) return a.includeOverdraftForSpend;
     const name=String(a&&a.name||'');
     try{
-      if(/(?:spending\s*account|monzo)/i.test(name)) return state.includeMonzoOverdraftForSpend||'no';
-      if(/(?:main\s*account|first\s*direct)/i.test(name)) return state.includeFirstDirectOverdraftForSpend||'no';
+      if(/monzo/i.test(name)) return state.includeMonzoOverdraftForSpend||'no';
+      if(/first\s*direct/i.test(name)) return state.includeFirstDirectOverdraftForSpend||'no';
     }catch(e){}
     return 'no';
   }
@@ -5748,6 +5736,7 @@ StableInputV254.patch();
   function boot(){ patchRenderers(); render(); [150,500,1200,2500,4000].forEach(ms=>setTimeout(()=>{patchRenderers();render();},ms)); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
   window.addEventListener('load',boot);
+  window.GrantOSGuidanceV28={render:render,boot:boot,patchRenderers:patchRenderers};
 })();
 </script>
 
@@ -5761,7 +5750,7 @@ StableInputV254.patch();
    the linked account balances, which prevents the card from showing theoretical money as spare.
 */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   function n(v){ const x=Number(String(v??'').replace(/[^0-9.-]/g,'')); return isNaN(x)?0:x; }
   function esc(v){ return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
   function fmt(v){ try{return money(v);}catch(e){return '£'+Number(v||0).toLocaleString('en-GB',{maximumFractionDigits:2});} }
@@ -6023,7 +6012,7 @@ StableInputV254.patch();
 
 <script id="v283AccountBudgetCleanupVersion">
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   function setVersion(){
     try{ document.title='Grant OS '+VERSION; }catch(e){}
     try{ const pill=document.querySelector('header .pill'); if(pill) pill.textContent=VERSION; }catch(e){}
@@ -6040,10 +6029,10 @@ StableInputV254.patch();
 
 <script id="v283BudgetInputPersistenceFix">
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   const CORE_NUMERIC=['wage','weeklyBudget','payday','emergencyFund','emergencyTarget'];
   const CORE_SELECTS=[];
-  const ACCOUNT_KEY=()=>{ try{return (window.AccountsUIV25527&&AccountsUIV25527.storeKey)||'grantOS_tester_accounts_build_v283';}catch(e){return 'grantOS_tester_accounts_build_v283';} };
+  const ACCOUNT_KEY=()=>{ try{return (window.AccountsUIV25527&&AccountsUIV25527.storeKey)||'grantOS.accounts.v2554';}catch(e){return 'grantOS.accounts.v2554';} };
   function n(v){ return Number(v||0); }
   function setVersion(){
     try{ document.title='Grant OS '+VERSION; }catch(e){}
@@ -6077,7 +6066,7 @@ StableInputV254.patch();
   function syncLegacyState(accounts){
     try{
       const find=re=>accounts.find(a=>re.test(String(a.name||'')));
-      const fd=find(/(?:main\s*account|first\s*direct)/i), monzo=find(/(?:spending\s*account|monzo)/i);
+      const fd=find(/first\s*direct/i), monzo=find(/monzo/i);
       if(fd){ const s=split(fd.balance); state.firstDirectBalance=s.balance; state.firstDirectOverdraft=s.overdraft; state.firstDirectOverdraftLimit=n(fd.limit||650); state.includeFirstDirectOverdraftForSpend=fd.includeOverdraftForSpend||'no'; }
       if(monzo){ const s=split(monzo.balance); state.monzoBalance=s.balance; state.monzoOverdraft=s.overdraft; state.monzoOverdraftLimit=n(monzo.limit||200); state.includeMonzoOverdraftForSpend=monzo.includeOverdraftForSpend||'no'; }
     }catch(e){}
@@ -6239,7 +6228,7 @@ StableInputV254.patch();
 
 <script id="v283MobileAccountFocusFix">
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   const ACCOUNT_INPUT_RE=/^(v274Acc|v25531Acc)(Bal|Od|Limit|Include)_\d+$/;
   function setVersion(){
     try{ document.title='Grant OS '+VERSION; }catch(e){}
@@ -6328,7 +6317,7 @@ StableInputV254.patch();
    Includes render stability and coalesces the older patch refresh timers on mobile so the app does not visibly shake on load.
    It does not change budget/debt/account calculations. */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   const nativeSetTimeout=window.__gosNativeSetTimeout||window.setTimeout.bind(window);
   const nativeClearTimeout=window.__gosNativeClearTimeout||window.clearTimeout.bind(window);
   const bootStart=performance.now();
@@ -6436,7 +6425,7 @@ StableInputV254.patch();
    fields for True Spare. Also forces new accounts from Accounts to appear immediately
    in Budget > Linked Account Figures. */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   const MAX_ACCOUNTS=5;
   const MS_DAY=24*60*60*1000;
   function n(v){ const x=Number(String(v??'').replace(/[^0-9.-]/g,'')); return isNaN(x)?0:x; }
@@ -6773,7 +6762,7 @@ StableInputV254.patch();
       }
     }catch(e){}
   }
-  function readAccounts(){ try{ if(window.AccountsUIV25527&&AccountsUIV25527.accounts) return AccountsUIV25527.accounts().slice(0,MAX_ACCOUNTS); }catch(e){} try{ return JSON.parse(localStorage.getItem('grantOS_tester_accounts_build_v283')||'[]').slice(0,MAX_ACCOUNTS); }catch(e){ return []; } }
+  function readAccounts(){ try{ if(window.AccountsUIV25527&&AccountsUIV25527.accounts) return AccountsUIV25527.accounts().slice(0,MAX_ACCOUNTS); }catch(e){} try{ return JSON.parse(localStorage.getItem('grantOS.accounts.v2554')||'[]').slice(0,MAX_ACCOUNTS); }catch(e){ return []; } }
   function forceBudgetAccountRefresh(){
     try{ if(window.Budget&&Budget.render) Budget.render(); }catch(e){}
     setTimeout(()=>{ try{ if(window.Budget&&Budget.render) Budget.render(); }catch(e){} try{ if(window.MobileV274&&MobileV274.renderAll) MobileV274.renderAll(); }catch(e){} renderSpareCard(); setVersion(); },120);
@@ -6787,7 +6776,7 @@ StableInputV254.patch();
         try{
           const accounts=readAccounts();
           if(accounts.length && (!accounts[accounts.length-1].name || /new account/i.test(accounts[accounts.length-1].name))){ accounts[accounts.length-1].includeOverdraftForSpend=accounts[accounts.length-1].includeOverdraftForSpend||'no'; }
-          if(window.AccountsUIV25527&&AccountsUIV25527.write) AccountsUIV25527.write(accounts); else localStorage.setItem('grantOS_tester_accounts_build_v283',JSON.stringify(accounts));
+          if(window.AccountsUIV25527&&AccountsUIV25527.write) AccountsUIV25527.write(accounts); else localStorage.setItem('grantOS.accounts.v2554',JSON.stringify(accounts));
         }catch(e){}
         forceBudgetAccountRefresh();
         return result;
@@ -6821,8 +6810,8 @@ StableInputV254.patch();
    Also hardens account sync so newly added Accounts rows immediately appear in Budget > Linked Account Figures.
 */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
-  const ACCOUNT_KEY=()=>{ try{return (window.AccountsUIV25527&&AccountsUIV25527.storeKey)||'grantOS_tester_accounts_build_v283';}catch(e){return 'grantOS_tester_accounts_build_v283';} };
+  const VERSION='Main Build 3.0';
+  const ACCOUNT_KEY=()=>{ try{return (window.AccountsUIV25527&&AccountsUIV25527.storeKey)||'grantOS.accounts.v2554';}catch(e){return 'grantOS.accounts.v2554';} };
   let baseCalcNextPaydayFn=null;
   const MAX_ACCOUNTS=5;
   const DAY_MS=24*60*60*1000;
@@ -6923,7 +6912,7 @@ StableInputV254.patch();
   function syncLegacyState(accounts){
     try{
       const find=re=>accounts.find(a=>re.test(String(a.name||'')));
-      const fd=find(/(?:main\s*account|first\s*direct)/i), monzo=find(/(?:spending\s*account|monzo)/i);
+      const fd=find(/first\s*direct/i), monzo=find(/monzo/i);
       if(fd){ const s=split(fd.balance); state.firstDirectBalance=s.balance; state.firstDirectOverdraft=s.overdraft; state.firstDirectOverdraftLimit=n(fd.limit||650); state.includeFirstDirectOverdraftForSpend=fd.includeOverdraftForSpend||'no'; }
       if(monzo){ const s=split(monzo.balance); state.monzoBalance=s.balance; state.monzoOverdraft=s.overdraft; state.monzoOverdraftLimit=n(monzo.limit||200); state.includeMonzoOverdraftForSpend=monzo.includeOverdraftForSpend||'no'; }
     }catch(e){}
@@ -7313,8 +7302,8 @@ StableInputV254.patch();
    their one-off due date the same way. Undated items are still included cautiously.
 */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
-  const ACCOUNT_KEY=()=>{ try{return (window.AccountsUIV25527&&AccountsUIV25527.storeKey)||'grantOS_tester_accounts_build_v283';}catch(e){return 'grantOS_tester_accounts_build_v283';} };
+  const VERSION='Main Build 3.0';
+  const ACCOUNT_KEY=()=>{ try{return (window.AccountsUIV25527&&AccountsUIV25527.storeKey)||'grantOS.accounts.v2554';}catch(e){return 'grantOS.accounts.v2554';} };
   const MAX_ACCOUNTS=5;
   const DAY_MS=24*60*60*1000;
   const MONTHS={jan:0,january:0,feb:1,february:1,mar:2,march:2,apr:3,april:3,may:4,jun:5,june:5,jul:6,july:6,aug:7,august:7,sep:8,sept:8,september:8,oct:9,october:9,nov:10,november:10,dec:11,december:11};
@@ -7396,7 +7385,7 @@ StableInputV254.patch();
   function split(balance){ const b=n(balance); return {balance:Math.max(0,b),overdraft:Math.max(0,-b)}; }
   function syncLegacyState(accounts){
     try{
-      const find=re=>accounts.find(a=>re.test(String(a.name||''))); const fd=find(/(?:main\s*account|first\s*direct)/i), monzo=find(/(?:spending\s*account|monzo)/i);
+      const find=re=>accounts.find(a=>re.test(String(a.name||''))); const fd=find(/first\s*direct/i), monzo=find(/monzo/i);
       if(fd){const s=split(fd.balance); state.firstDirectBalance=s.balance; state.firstDirectOverdraft=s.overdraft; state.firstDirectOverdraftLimit=n(fd.limit||650); state.includeFirstDirectOverdraftForSpend=fd.includeOverdraftForSpend||'no';}
       if(monzo){const s=split(monzo.balance); state.monzoBalance=s.balance; state.monzoOverdraft=s.overdraft; state.monzoOverdraftLimit=n(monzo.limit||200); state.includeMonzoOverdraftForSpend=monzo.includeOverdraftForSpend||'no';}
     }catch(e){}
@@ -7520,7 +7509,7 @@ StableInputV254.patch();
    passed due dates are treated as already handled.
 */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   function setVersion(){ try{document.title='Grant OS '+VERSION;}catch(e){} try{const pill=document.querySelector('header .pill'); if(pill) pill.textContent=VERSION;}catch(e){} }
   function removeOldGuides(){
     try{
@@ -7578,10 +7567,10 @@ StableInputV254.patch();
    - Editing due dates/figures updates True Spare and Finance Health live without needing a page refresh.
 */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   const DAY_MS=24*60*60*1000;
   const MONTHS={jan:0,january:0,feb:1,february:1,mar:2,march:2,apr:3,april:3,may:4,jun:5,june:5,jul:6,july:6,aug:7,august:7,sep:8,sept:8,september:8,oct:9,october:9,nov:10,november:10,dec:11,december:11};
-  const ACCOUNT_KEY=()=>{ try{return (window.AccountsUIV25527&&AccountsUIV25527.storeKey)||'grantOS_tester_accounts_build_v283';}catch(e){return 'grantOS_tester_accounts_build_v283';} };
+  const ACCOUNT_KEY=()=>{ try{return (window.AccountsUIV25527&&AccountsUIV25527.storeKey)||'grantOS.accounts.v2554';}catch(e){return 'grantOS.accounts.v2554';} };
   function n(v){ const x=Number(String(v??'').replace(/[^0-9.-]/g,'')); return isNaN(x)?0:x; }
   function esc(v){ return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
   function fmt(v){ try{return money(v);}catch(e){ return '£'+Number(v||0).toLocaleString('en-GB',{maximumFractionDigits:2}); } }
@@ -7747,7 +7736,7 @@ StableInputV254.patch();
 
 <script id="v2835VersionFinalGuard">
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   function setVersion(){
     try{ document.title='Grant OS '+VERSION; }catch(e){}
     try{ document.querySelectorAll('.pill').forEach(function(el){ if(/v2\./i.test(el.textContent||'')) el.textContent=VERSION; }); }catch(e){}
@@ -7759,10 +7748,10 @@ StableInputV254.patch();
 })();
 </script>
 <script id="v283FinancialHealthCleanSourceBridge">
-/* v2.8.4 Tester Safe Spend Target Logic Fix
+/* Main Build 3.0
    Lightweight bridge only: no duplicate scoring. It calls the single HealthV21 renderer after relevant changes. */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   function setVersion(){ try{ document.title='Grant OS '+VERSION; }catch(e){} try{ document.querySelectorAll('header .pill,.version,.version-label,#versionLabel,#appVersion,[data-version]').forEach(el=>{ el.textContent=VERSION; }); }catch(e){} }
   function refresh(){ setVersion(); try{ if(window.HealthV21&&HealthV21.render) HealthV21.render(); }catch(e){} }
   let t=null; function queue(ms=60){ clearTimeout(t); t=setTimeout(refresh,ms); }
@@ -7776,13 +7765,13 @@ StableInputV254.patch();
 </script>
 
 <script id="v283FinancialHealthLiveAccountSyncFix">
-/* v2.8.4 Tester Safe Spend Target Logic Fix
+/* Main Build 3.0
    One account source of truth for phone and desktop linked account fields.
    Any visible/active linked-account input writes immediately to the shared account store,
    then True Spare and Financial Health are recalculated from that shared store. */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
-  const STORE_KEY=()=>{ try{return (window.AccountsUIV25527&&AccountsUIV25527.storeKey)||'grantOS_tester_accounts_build_v283';}catch(e){return 'grantOS_tester_accounts_build_v283';} };
+  const VERSION='Main Build 3.0';
+  const STORE_KEY=()=>{ try{return (window.AccountsUIV25527&&AccountsUIV25527.storeKey)||'grantOS.accounts.v2554';}catch(e){return 'grantOS.accounts.v2554';} };
   const MAX=5;
   function n(v){ const x=Number(String(v??'').replace(/[^0-9.-]/g,'')); return isNaN(x)?0:x; }
   function setVersion(){ try{document.title='Grant OS '+VERSION;}catch(e){} try{document.querySelectorAll('header .pill,.version,.version-label,#versionLabel,#appVersion,[data-version]').forEach(el=>{ el.textContent=VERSION; });}catch(e){} }
@@ -7797,8 +7786,8 @@ StableInputV254.patch();
   }
   function syncLegacy(accounts){
     try{
-      function isFD(a){ return /(?:main\s*account|first\s*direct)/i.test(String(a&&a.name||'')); }
-      function isMonzo(a){ return /(?:spending\s*account|monzo)/i.test(String(a&&a.name||'')); }
+      function isFD(a){ return /first\s*direct/i.test(String(a&&a.name||'')); }
+      function isMonzo(a){ return /monzo/i.test(String(a&&a.name||'')); }
       const fd=accounts.find(isFD), monzo=accounts.find(isMonzo);
       if(fd){ const s=split(fd.balance); state.firstDirectBalance=s.balance; state.firstDirectOverdraft=s.overdraft; state.firstDirectOverdraftLimit=n(fd.limit||650); state.includeFirstDirectOverdraftForSpend=fd.includeOverdraftForSpend||'no'; }
       if(monzo){ const s=split(monzo.balance); state.monzoBalance=s.balance; state.monzoOverdraft=s.overdraft; state.monzoOverdraftLimit=n(monzo.limit||200); state.includeMonzoOverdraftForSpend=monzo.includeOverdraftForSpend||'no'; }
@@ -7869,12 +7858,12 @@ StableInputV254.patch();
 </script>
 
 <script id="v283CrossViewInputSyncFix">
-/* v2.8.4 Tester Safe Spend Target Logic Fix
+/* Main Build 3.0
    Final cross-view bridge for fields that exist in both desktop tables and mobile cards.
    Rule: the active/visible field writes to one shared state/account source immediately;
    desktop and mobile views are refreshed from that same source when it is safe to do so. */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   const ACCOUNT_MAX=5;
   const ACCOUNT_PREFIXES=['v274Acc','v25531Acc'];
   const SYNC_SELECTOR=[
@@ -7894,7 +7883,7 @@ StableInputV254.patch();
   function isVisible(el){
     try{ if(!el) return false; const st=getComputedStyle(el); if(st.display==='none'||st.visibility==='hidden') return false; return !!(el.offsetParent||el.getClientRects().length); }catch(e){ return false; }
   }
-  function accountStoreKey(){ try{return (window.AccountsUIV25527&&AccountsUIV25527.storeKey)||'grantOS_tester_accounts_build_v283';}catch(e){return 'grantOS_tester_accounts_build_v283';} }
+  function accountStoreKey(){ try{return (window.AccountsUIV25527&&AccountsUIV25527.storeKey)||'grantOS.accounts.v2554';}catch(e){return 'grantOS.accounts.v2554';} }
   function split(balance){ const b=n(balance); return {balance:Math.max(0,b), overdraft:Math.max(0,-b)}; }
   function normAccount(a,i){ return {name:String(a&&a.name||('Account '+(i+1))).trim()||('Account '+(i+1)), type:String(a&&a.type||'Current'), balance:n(a&&a.balance), limit:Math.max(0,n(a&&a.limit)), includeOverdraftForSpend:(a&&a.includeOverdraftForSpend)==='yes'?'yes':'no'}; }
   function readAccounts(){
@@ -7906,7 +7895,7 @@ StableInputV254.patch();
   function syncLegacyAccounts(accounts){
     try{
       const find=re=>accounts.find(a=>re.test(String(a&&a.name||'')));
-      const fd=find(/(?:main\s*account|first\s*direct)/i), monzo=find(/(?:spending\s*account|monzo)/i);
+      const fd=find(/first\s*direct/i), monzo=find(/monzo/i);
       if(fd){ const s=split(fd.balance); state.firstDirectBalance=s.balance; state.firstDirectOverdraft=s.overdraft; state.firstDirectOverdraftLimit=n(fd.limit||650); state.includeFirstDirectOverdraftForSpend=fd.includeOverdraftForSpend||'no'; }
       if(monzo){ const s=split(monzo.balance); state.monzoBalance=s.balance; state.monzoOverdraft=s.overdraft; state.monzoOverdraftLimit=n(monzo.limit||200); state.includeMonzoOverdraftForSpend=monzo.includeOverdraftForSpend||'no'; }
     }catch(e){}
@@ -8032,13 +8021,13 @@ StableInputV254.patch();
 
 
 <script id="v283CashflowWarningCardFix">
-/* v2.8.4 Tester Safe Spend Target Logic Fix
+/* Main Build 3.0
    Converts the compact Days Until Payday dashboard card into a Cashflow Until Payday card.
    The card stays compact, keeps the days count, and adds a closed breakdown dropdown.
    It does not overwrite the user's weekly spend target; it highlights whether planned spend is covered.
 */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   function n(v){ const x=parseFloat(String(v??'').replace(/[^0-9.-]/g,'')); return Number.isFinite(x)?x:0; }
   function money(v){ return (window.money ? window.money(n(v)) : '£'+n(v).toFixed(2)); }
   function setVersion(){
@@ -8152,47 +8141,9 @@ StableInputV254.patch();
 </script>
 
 
-<script id="v283TesterBuildFinalGuard">
-(function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
-  const STATE_KEY='grantOS_tester_build_v283';
-  const ACCOUNT_KEY='grantOS_tester_accounts_build_v283';
-  const starterAccounts=[
-    {name:'Main Account',type:'Current',balance:0,limit:0,includeOverdraftForSpend:'no'},
-    {name:'Spending Account',type:'Current',balance:0,limit:0,includeOverdraftForSpend:'no'}
-  ];
-  function setVersion(){
-    try{document.title='Grant OS '+VERSION;}catch(e){}
-    try{document.querySelectorAll('header .pill,.version,.version-label,#versionLabel,#appVersion,[data-version]').forEach(function(el){ if(el) el.textContent=VERSION; });}catch(e){}
-  }
-  function setTesterStorage(){
-    try{ if(window.AccountsUIV25527){ AccountsUIV25527.storeKey=ACCOUNT_KEY; AccountsUIV25527.defaults=function(){return starterAccounts.map(function(a){return Object.assign({},a);});}; } }catch(e){}
-    try{ if(window.AccountSyncV25516) AccountSyncV25516.accountStoreKey=ACCOUNT_KEY; }catch(e){}
-    try{
-      var raw=localStorage.getItem(ACCOUNT_KEY), data=raw?JSON.parse(raw):[];
-      if(!Array.isArray(data)||!data.length) localStorage.setItem(ACCOUNT_KEY,JSON.stringify(starterAccounts));
-    }catch(e){ try{localStorage.setItem(ACCOUNT_KEY,JSON.stringify(starterAccounts));}catch(err){} }
-  }
-  function cleanDefaults(){
-    try{
-      if(typeof Defaults!=='undefined'){
-        Defaults.wage=0; Defaults.firstDirectBalance=0; Defaults.firstDirectOverdraft=0; Defaults.monzoBalance=0; Defaults.monzoOverdraft=0;
-        Defaults.firstDirectOverdraftLimit=0; Defaults.monzoOverdraftLimit=0; Defaults.includeFirstDirectOverdraftForSpend='no'; Defaults.includeMonzoOverdraftForSpend='no';
-        Defaults.weeklyBudget=0; Defaults.emergencyFund=0; Defaults.emergencyTarget=0; Defaults.fixed=[]; Defaults.debts=[]; Defaults.holidays=[]; Defaults.thai=[]; Defaults.nz=[]; Defaults.jobs=[];
-      }
-    }catch(e){}
-  }
-  function boot(){ cleanDefaults(); setTesterStorage(); setVersion(); }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
-  window.addEventListener('load',boot);
-  [50,250,750,1500,3500,7000].forEach(function(ms){setTimeout(boot,ms);});
-})();
-</script>
-
-
 
 <script id="v284SafeSpendTargetLogicFix">
-/* v2.8.4 Tester Safe Spend Target Logic Fix
+/* Main Build 3.0
    Safe Weekly Spend is now the source calculation.
    Safe Daily Spend follows Safe Weekly Spend ÷ 7.
    The weekly target is used when it is affordable until payday; if not, it is reduced.
@@ -8200,7 +8151,7 @@ StableInputV254.patch();
    Overdraft buffer is only included for accounts where the safe-spend overdraft rule is selected.
 */
 (function(){
-  const VERSION='v2.8.4 Tester Safe Spend Target Logic Fix';
+  const VERSION='Main Build 3.0';
   function n(v){ const x=parseFloat(String(v??'').replace(/[^0-9.-]/g,'')); return Number.isFinite(x)?x:0; }
   function fmt(v){ try{return money(n(v));}catch(e){return '£'+n(v).toLocaleString('en-GB',{maximumFractionDigits:2});} }
   function esc(v){ return String(v??'').replace(/[&<>\"]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];}); }
@@ -8428,7 +8379,7 @@ StableInputV254.patch();
 
 
 <style id="v286HousekeepingScrollCSS">
-/* Test Build 3.0
+/* Main Build 3.0
    Final stability layer only: prevents old scheduled refresh/render patches from rebuilding visible cards while the user is scrolling. */
 html,body,#app,.card,.stat-card,.gos-help,.v274-mobile-card{overflow-anchor:none!important;}
 .stat-card .big,.card .big,.value-soft,#safeToday,#safeWeek,#spareAfterWage,#bankPosition,#totalOverdraft,#debtRemaining,#daysPayday{
@@ -8448,11 +8399,11 @@ body.gos-is-scrolling .stat-card .big,body.gos-is-scrolling .value-soft,body.gos
 }
 </style>
 <script id="v286HousekeepingScrollStability">
-/* Test Build 3.0
+/* Main Build 3.0
    Tidies the runtime behaviour without changing the finance maths.
    Old compatibility patches can still run, but visual rebuilds are delayed until scrolling stops. */
 (function(){
-  const VERSION='Test Build 3.0';
+  const VERSION='Main Build 3.0';
   const SCROLL_IDLE_MS=170;
   let scrolling=false;
   let idleTimer=null;
@@ -8619,7 +8570,7 @@ body.gos-is-scrolling #nextPriority{transition:none!important;animation:none!imp
 
 <script id="v301CopyrightPriorityStability">
 (function(){
-  const VERSION='Test Build 3.0';
+  const VERSION='Main Build 3.0';
   const DAY=24*60*60*1000;
   const AUTO_KEY='grantOSHelperAutoTipsOff_v301';
   const DISMISSED_KEY='grantOSHelperDismissedSession_v301';
@@ -8966,7 +8917,7 @@ body.gos-perf-scrolling #grantOSHelperBtn{animation:none!important;}
    Blocks scroll-triggered re-renders and stabilises high-risk cards across the app.
    It does not change the safe spend, cashflow, debt or health maths. */
 (function(){
-  const VERSION='Test Build 3.0';
+  const VERSION='Main Build 3.0';
   const SCROLL_IDLE_MS=620;
   const HIGH_RISK=['#nextPriority','#priorityQueue','#v283EstimatedSpareCard','#v274DebtMobile','#debtTable','#debtProgressList','#alertsBox','#paydayResult'];
   let scrolling=false, scrollTimer=null, renderTimer=null, restoring=false;
@@ -9132,6 +9083,494 @@ body.gos-perf-scrolling #grantOSHelperBtn{animation:none!important;}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
   window.addEventListener('load',()=>{boot(); setTimeout(()=>stabiliseNow(true),800);});
   window.GrantOSPerformanceV302={VERSION,stabiliseNow,beginScroll,endScroll,getActions};
+})();
+</script>
+
+
+<style id="v303HolidayAffordabilitySyncCSS">
+/* Build 3.0 holiday affordability sync: layout stability + pay-by date support. */
+#holidayTable input,#holidayTable select,#v274HolidayMobile input,#v274HolidayMobile select{min-height:46px!important;box-sizing:border-box!important;font-variant-numeric:tabular-nums!important;}
+#holidayTable,#holidayControlTable,#v274HolidayMobile,#v274HolidaySummaryMobile{overflow-anchor:none!important;contain:layout paint!important;}
+#holidayTable td,#holidayTable th,#holidayControlTable td,#holidayControlTable th{vertical-align:top!important;}
+#v274HolidayMobile .v274-mobile-card,#v274HolidaySummaryMobile .v274-mobile-card{min-height:250px!important;contain:layout paint!important;overflow-anchor:none!important;}
+#v274HolidayMobile .v274-mobile-sub,#v274HolidaySummaryMobile .v274-mobile-sub{min-height:1.45em!important;display:block!important;}
+#v283SpareHolidayRow{display:flex!important;justify-content:space-between!important;gap:12px!important;}
+body.gos-perf-scrolling #holidayTable,body.gos-perf-scrolling #holidayControlTable,body.gos-perf-scrolling #v274HolidayMobile,body.gos-perf-scrolling #v274HolidaySummaryMobile{transition:none!important;animation:none!important;}
+</style>
+<script id="v303HolidayAffordabilitySync">
+/* Build 3.0 holiday affordability sync.
+   Adds a Pay by date input, recalculates holiday summary from today's live date,
+   uses remaining outstanding after saved/ringfenced, and includes holiday payments
+   due before payday in Safe Spend, Cashflow, True Spare and priority data.
+   Status labels/classes are intentionally kept as: Fully Funded / Covered by Wage / Extra Income Needed. */
+(function(){
+  const VERSION='Main Build 3.0';
+  const DAY=24*60*60*1000;
+  let holidayTimer=null, liveTimer=null;
+  const originalSafe = (window.GrantOSSafeSpendV285&&GrantOSSafeSpendV285.calculate) || (window.GrantOSSafeSpendV284&&GrantOSSafeSpendV284.calculate) || null;
+  const originalDueEstimate = (window.GrantOSDueDateV2835&&GrantOSDueDateV2835.estimate) || null;
+  const originalCashflowRender = (window.GrantOSCashflowWarningCard&&GrantOSCashflowWarningCard.render) || null;
+  function n(v){ const x=parseFloat(String(v??'').replace(/[^0-9.-]/g,'')); return Number.isFinite(x)?x:0; }
+  function esc(v){ return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  function fmt(v){ try{return (typeof money==='function')?money(n(v)):'£'+n(v).toLocaleString('en-GB',{maximumFractionDigits:2});}catch(e){return '£'+n(v).toLocaleString('en-GB',{maximumFractionDigits:2});} }
+  function setVersion(){ try{document.title='Grant OS '+VERSION;}catch(e){} try{const pill=document.querySelector('header .pill'); if(pill) pill.textContent=VERSION;}catch(e){} }
+  function stateObj(){ try{return (typeof state!=='undefined'&&state)?state:null;}catch(e){return null;} }
+  function save(){ try{ if(window.Data&&Data.save) Data.save(); else localStorage.setItem('grantOS_v1',JSON.stringify(state)); }catch(e){} }
+  function todayStart(){ const d=new Date(); d.setHours(0,0,0,0); return d; }
+  function iso(d){ if(!d||isNaN(d.getTime())) return ''; return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function parseDate(v){
+    const s=String(v||'').trim(); if(!s) return null;
+    if(/^\d{1,2}$/.test(s)){ const day=Math.max(1,Math.min(31,parseInt(s,10))); const t=todayStart(); let d=new Date(t.getFullYear(),t.getMonth(),day); if(d<t) d=new Date(t.getFullYear(),t.getMonth()+1,day); return d; }
+    const d=new Date(s); if(isNaN(d.getTime())) return null; d.setHours(0,0,0,0); return d;
+  }
+  function nextPayday(){
+    try{ if(window.Calc&&Calc.nextPayday){ const d=Calc.nextPayday(); if(d&&!isNaN(d.getTime())){ d.setHours(0,0,0,0); return d; } } }catch(e){}
+    const s=stateObj()||{}; const explicit=parseDate(s.nextPaydayDate); if(explicit) return explicit;
+    const t=todayStart(), day=Math.max(1,Math.min(31,n(s.payday||26))); let d=new Date(t.getFullYear(),t.getMonth(),day); if(t.getDate()>=day) d=new Date(t.getFullYear(),t.getMonth()+1,day); d.setHours(0,0,0,0); return d;
+  }
+  function migrate(){
+    const s=stateObj(); if(!s) return;
+    if(!Array.isArray(s.holidays)) s.holidays=[];
+    s.holidays=s.holidays.map(function(h){
+      const r=Array.isArray(h)?h.slice():[];
+      while(r.length<6) r.push('');
+      r[0]=r[0]||'New holiday'; r[1]=r[1]||''; r[2]=n(r[2]); r[3]=n(r[3]);
+      // Existing Date/Due Date values become the default Pay by date so old data still works.
+      if(!String(r[5]||'').trim() && String(r[4]||'').trim()) r[5]=r[4];
+      return r;
+    });
+  }
+  function holidayDate(h){ return parseDate(h&&h[4]); }
+  function payByDate(h){ return parseDate((h&&h[5]) || (h&&h[4])); }
+  function remaining(h){ return Math.max(0,n(h&&h[2])-n(h&&h[3])); }
+  function paydaysBefore(date){
+    if(!date) return 0;
+    const pd=nextPayday(); let cursor=new Date(pd.getFullYear(),pd.getMonth(),pd.getDate()); let count=0;
+    const end=new Date(date.getFullYear(),date.getMonth(),date.getDate());
+    for(let guard=0; guard<240 && cursor<=end; guard++){ count++; cursor=new Date(cursor.getFullYear(),cursor.getMonth()+1,cursor.getDate()); }
+    return count;
+  }
+  function debtType(d){
+    const raw=String((d&&d[4])||'Regular').toLowerCase(); const name=String((d&&d[0])||'').toLowerCase();
+    if(/bnpl|klarna|clearpay|pay in 3|pay later|currys/.test(raw+' '+name)) return 'BNPL';
+    if(/one/.test(raw)) return 'One-off';
+    if(/flex/.test(raw)) return 'Flexible';
+    return 'Regular';
+  }
+  function debtDueDate(d){ return parseDate((d&&d[5]) || (d&&d[3])); }
+  function monthlyBillsTotal(){ const s=stateObj(); return (s&&Array.isArray(s.fixed)?s.fixed:[]).reduce((sum,r)=>sum+n(r&&r[1]),0); }
+  function regularDebtMonthly(){ const s=stateObj(); return (s&&Array.isArray(s.debts)?s.debts:[]).reduce(function(sum,d){ if(n(d&&d[1])<=0) return sum; const type=debtType(d); if(type==='BNPL'||type==='One-off') return sum; return sum+Math.min(n(d&&d[1]),Math.max(0,n(d&&d[2]))); },0); }
+  function oneOffDebtDueBefore(date){
+    if(!date) return 0; const s=stateObj(); const list=(s&&Array.isArray(s.debts))?s.debts:[]; let total=0;
+    list.forEach(function(d){ const bal=n(d&&d[1]); if(bal<=0) return; const type=debtType(d); if(type!=='BNPL'&&type!=='One-off') return; const due=debtDueDate(d); if(due && due<=date) total+=bal; });
+    return total;
+  }
+  function wageCapacityTo(date){
+    const s=stateObj()||{}; const paydays=paydaysBefore(date); const weekly=n(s.weeklyBudget||0); const wage=n(s.wage||0);
+    const monthlyBase=Math.max(0,wage-monthlyBillsTotal()-regularDebtMonthly()-(weekly*4));
+    const oneOffDue=oneOffDebtDueBefore(date);
+    const available=Math.max(0,(paydays*monthlyBase)-oneOffDue);
+    return {paydays,monthlyBase,oneOffDue,available,weekly,wage,bills:monthlyBillsTotal(),regularDebt:regularDebtMonthly()};
+  }
+  function holidayDueBeforePayday(){
+    migrate(); const s=stateObj(); const pd=nextPayday(); let total=0,count=0,items=[];
+    (s&&Array.isArray(s.holidays)?s.holidays:[]).forEach(function(h){ const rem=remaining(h); if(rem<=0) return; const due=payByDate(h); if(due && due<=pd){ total+=rem; count++; items.push({name:String(h[0]||'Holiday'),remaining:rem,date:due}); } });
+    return {total,count,items,payday:pd};
+  }
+  function holidayStatus(h){
+    const rem=remaining(h);
+    if(rem<=0) return {label:'Fully Funded', cls:'status-green', icon:'🟢', detail:'Saved/ringfenced covers the target.'};
+    const due=payByDate(h); const cap=wageCapacityTo(due);
+    if(cap.available>=rem) return {label:'Covered by Wage', cls:'status-amber', icon:'🟠', detail:`${cap.paydays} payday(s) before pay-by date. Forecast spare after bills/debts/weekly spend: ${fmt(cap.available)}.`};
+    return {label:'Extra Income Needed', cls:'status-red', icon:'🔴', detail:`Forecast spare before date: ${fmt(cap.available)}. Short by ${fmt(rem-cap.available)}.`};
+  }
+  function tableHTML(){
+    const s=stateObj(); const rows=(s&&Array.isArray(s.holidays)?s.holidays:[]);
+    return '<tr><th>Holiday</th><th>Note</th><th>Target</th><th>Saved/Ringfenced</th><th>Holiday date</th><th>Pay by date</th><th>Remove</th></tr>' + rows.map(function(r,i){
+      return `<tr><td><input value="${esc(r[0])}" oninput="GrantOSHolidaySync.update(${i},0,this.value)"></td><td><input value="${esc(r[1]||'')}" oninput="GrantOSHolidaySync.update(${i},1,this.value)"></td><td><input type="number" value="${n(r[2])}" oninput="GrantOSHolidaySync.update(${i},2,this.value)"></td><td><input type="number" value="${n(r[3])}" oninput="GrantOSHolidaySync.update(${i},3,this.value)"></td><td><input placeholder="Holiday date" value="${esc(r[4]||'')}" oninput="GrantOSHolidaySync.update(${i},4,this.value)"></td><td><input placeholder="YYYY-MM-DD" value="${esc(r[5]||'')}" oninput="GrantOSHolidaySync.update(${i},5,this.value)" onblur="GrantOSHolidaySync.refreshAll()"></td><td><button class="danger" type="button" onclick="GrantOSHolidaySync.remove(${i})">Remove</button></td></tr>`;
+    }).join('');
+  }
+  function renderTable(){ const t=document.getElementById('holidayTable'); if(!t) return; t.innerHTML=tableHTML(); }
+  function renderSummary(){
+    migrate(); const s=stateObj(); const rows=[...(s&&Array.isArray(s.holidays)?s.holidays:[])].sort(function(a,b){ const da=payByDate(a), db=payByDate(b); if(da&&db) return da-db; if(da&&!db) return -1; if(!da&&db) return 1; return String(a[0]||'').localeCompare(String(b[0]||'')); });
+    const t=document.getElementById('holidayControlTable'); if(t){
+      t.innerHTML='<tr><th>Holiday</th><th>Pay by date</th><th>Target</th><th>Saved</th><th>Remaining</th><th>Status</th><th>Status Detail</th></tr>'+rows.map(function(h){ const st=holidayStatus(h), rem=remaining(h); return `<tr><td>${esc(h[0])}</td><td>${esc(h[5]||h[4]||'')}</td><td>${fmt(h[2])}</td><td>${fmt(h[3])}</td><td>${fmt(rem)}</td><td><span class="status-badge ${esc(st.cls)}">${esc(st.icon)} ${esc(st.label)}</span></td><td class="note">${esc(st.detail)}</td></tr>`; }).join('');
+    }
+    renderSummaryMobile(rows);
+  }
+  function ensureAfter(anchorId,id){ const anchor=document.getElementById(anchorId); if(!anchor) return null; let box=document.getElementById(id); if(!box){ box=document.createElement('div'); box.id=id; box.className='v274-mobile-editor'; anchor.insertAdjacentElement('afterend',box); } return box; }
+  function renderMobile(){
+    migrate(); const s=stateObj(); const box=ensureAfter('holidayTable','v274HolidayMobile'); if(!box) return; const rows=(s&&Array.isArray(s.holidays)?s.holidays:[]);
+    box.innerHTML=rows.length?rows.map(function(r,i){ const st=holidayStatus(r); return `<div class="v274-mobile-card"><div class="v274-mobile-title">${esc(r[0]||'Holiday')}<span class="v274-mobile-sub">${esc(st.label)}</span></div><div class="v274-mobile-grid"><label class="v274-mobile-field"><span>Holiday</span><input value="${esc(r[0])}" oninput="GrantOSHolidaySync.update(${i},0,this.value)"></label><label class="v274-mobile-field"><span>Note</span><input value="${esc(r[1]||'')}" oninput="GrantOSHolidaySync.update(${i},1,this.value)"></label><label class="v274-mobile-field"><span>Target</span><input type="number" value="${n(r[2])}" oninput="GrantOSHolidaySync.update(${i},2,this.value)"></label><label class="v274-mobile-field"><span>Saved / Ringfenced</span><input type="number" value="${n(r[3])}" oninput="GrantOSHolidaySync.update(${i},3,this.value)"></label><label class="v274-mobile-field"><span>Holiday date</span><input value="${esc(r[4]||'')}" oninput="GrantOSHolidaySync.update(${i},4,this.value)"></label><label class="v274-mobile-field"><span>Pay by date</span><input placeholder="YYYY-MM-DD" value="${esc(r[5]||'')}" oninput="GrantOSHolidaySync.update(${i},5,this.value)" onblur="GrantOSHolidaySync.refreshAll()"><small>Holiday Summary and cashflow use this date.</small></label></div><div class="v274-mobile-actions"><button class="danger" type="button" onclick="GrantOSHolidaySync.remove(${i})">Remove</button></div></div>`; }).join(''):'<div class="v274-mobile-empty">No holiday pots yet. Tap Add holiday to create one.</div>';
+  }
+  function renderSummaryMobile(rows){
+    const box=ensureAfter('holidayControlTable','v274HolidaySummaryMobile'); if(!box) return;
+    box.innerHTML=rows.length?rows.map(function(h){ const st=holidayStatus(h), rem=remaining(h); return `<div class="v274-mobile-card"><div class="v274-mobile-title">${esc(h[0]||'Holiday')}<span class="status-badge ${esc(st.cls)}">${esc(st.label)}</span></div><div class="v274-mobile-grid"><div><span>Pay by date</span><strong>${esc(h[5]||h[4]||'')}</strong></div><div><span>Target</span><strong>${fmt(h[2])}</strong></div><div><span>Saved</span><strong>${fmt(h[3])}</strong></div><div><span>Remaining</span><strong>${fmt(rem)}</strong></div></div><p class="note">${esc(st.detail)}</p></div>`; }).join(''):'<div class="v274-mobile-empty">No holiday summary yet.</div>';
+  }
+  function baseSafeCalc(){ try{return originalSafe?originalSafe():null;}catch(e){return null;} }
+  function safeCalc(){
+    const base=baseSafeCalc()||{}; const due=holidayDueBeforePayday(); const target=n(base.target||((stateObj()||{}).weeklyBudget)); const days=Math.max(1,n(base.days)||1); const selected=n(base.selectedSpendPot); const billsDue=n(base.billsDue); const debtsDue=n(base.debtsDue); const dueCommitments=billsDue+debtsDue+due.total; const livingSpendPot=Math.max(0,selected-dueCommitments); const targetNeeded=(target/7)*days; const affordable=targetNeeded<=livingSpendPot+0.004; const safeWeekly=target<=0?0:(affordable?target:Math.max(0,(livingSpendPot/days)*7)); const safeDaily=safeWeekly/7; const shortfall=Math.max(0,targetNeeded-livingSpendPot); let status='on-target'; if(safeWeekly<=0) status='none'; else if(!affordable) status='reduced'; return Object.assign({},base,{holidayDue:due,holidaysDue:due.total,dueCommitments,livingSpendPot,targetNeeded,affordable,safeWeekly,safeDaily,shortfall,status});
+  }
+  function setValue(id,val,cls){ const el=document.getElementById(id); if(!el) return; el.textContent=fmt(val); el.className='big value-soft '+cls; }
+  function kv(rows){ return '<div class="gos-kv">'+rows.map(r=>'<div><span>'+esc(r[0])+'</span><strong>'+r[1]+'</strong></div>').join('')+'</div>'; }
+  function detail(id,title,body){ let el=document.getElementById(id); const value=document.getElementById(id==='gosSafeTodayBreakdown'?'safeToday':'safeWeek'); const card=value&&(value.closest('.card')||value.parentElement); if(!el&&card){el=document.createElement('details'); el.id=id; el.className='gos-help calc'; card.appendChild(el);} if(el) el.innerHTML='<summary><span>'+esc(title)+'</span><span class="gos-help-chevron">⌄</span></summary><div class="gos-help-body">'+body+'</div>'; }
+  function updateSafeSpend(){
+    const c=safeCalc(); setValue('safeWeek',c.safeWeekly,c.safeWeekly>0?(c.affordable?'value-info':'value-warning'):'value-warning'); setValue('safeToday',c.safeDaily,c.safeDaily>0?(c.affordable?'value-positive':'value-warning'):'value-warning');
+    detail('gosSafeWeekBreakdown','How is this calculated?',kv([
+      ['Account spend pot before due bills/debts/holiday',fmt(c.selectedSpendPot)],
+      ['Bills still due before payday','-'+fmt(c.billsDue)],
+      ['Debts still due before payday','-'+fmt(c.debtsDue)],
+      ['Holiday pay-by amounts due before payday','-'+fmt(c.holidaysDue)],
+      ['Living spend pot after due commitments',fmt(c.livingSpendPot)],
+      ['Days until payday',String(Math.round(c.days))],
+      ['Weekly spend target',fmt(c.target)],
+      ['Target needed until payday',fmt(c.targetNeeded)],
+      ['Shown safe weekly spend',fmt(c.safeWeekly)]
+    ])+'<div class="gos-formula">'+(c.affordable?'Target covered: <strong>'+fmt(c.target)+'</strong> remains the safe weekly spend.':'Target not covered: '+fmt(c.livingSpendPot)+' ÷ '+Math.round(c.days)+' day(s) × 7 = <strong>'+fmt(c.safeWeekly)+'</strong> per week.')+'</div><p class="note">Holiday pay-by amounts only reduce current Safe Spend when their Pay by date is on or before the next payday.</p>');
+    detail('gosSafeTodayBreakdown','How is this calculated?',kv([['Safe weekly spend',fmt(c.safeWeekly)],['Daily calculation',fmt(c.safeWeekly)+' ÷ 7'],['Safe daily spend',fmt(c.safeDaily)]])+'<div class="gos-formula">'+fmt(c.safeWeekly)+' ÷ 7 = <strong>'+fmt(c.safeDaily)+'</strong></div><p class="note">Daily spend now follows the weekly safe spend figure, so both cards stay connected.</p>');
+    try{ window.GrantOSSafeSpendTarget=c; }catch(e){}
+  }
+  function estimateWithHoliday(){
+    let e={}; try{ e=originalDueEstimate?originalDueEstimate():((window.GrantOSDateOnlyV283&&GrantOSDateOnlyV283.estimate)?GrantOSDateOnlyV283.estimate():{}); }catch(err){ e={}; }
+    const due=holidayDueBeforePayday(); const cash=n(e.cashAvailable); const commitments=n(e.commitmentsDue)+due.total; const value=Math.max(0,cash-commitments);
+    return Object.assign({},e,{holiday:due,holidayDue:due.total,holidayDueCount:due.count,commitmentsDue:commitments,value,blocked:cash<=0||commitments>=cash,capped:value<cash});
+  }
+  function updateSpare(){
+    const e=estimateWithHoliday(); const setMoney=(id,v)=>{const el=document.getElementById(id); if(el) el.textContent=fmt(v);}; const val=document.getElementById('v283SpareValue'); if(val){val.textContent=fmt(e.value); val.className='big value-soft '+(e.value>0?'value-positive':'value-warning');}
+    let row=document.getElementById('v283SpareHolidayRow'); const debtEl=document.getElementById('v283SpareDebt'); if(!row&&debtEl){ const wrap=debtEl.closest('div'); if(wrap){row=document.createElement('div'); row.id='v283SpareHolidayRow'; row.innerHTML='<span>Holiday pay-by due before payday</span><strong id="v283SpareHoliday">£0</strong>'; wrap.insertAdjacentElement('afterend',row);} }
+    setMoney('v283SpareHoliday',e.holidayDue); setMoney('v283SpareCommitments',e.commitmentsDue);
+    const status=document.getElementById('v283SpareStatus'); if(status&&e.holidayDue>0){ if(e.value<=0) status.textContent='No spare because due bills, debts, holiday pay-by amounts and living reserve use the available money before payday.'; }
+    const extra=document.getElementById('v283DateAwareBreakdownNote'); if(extra && e.holidayDue>0 && !/Holiday pay-by included/.test(extra.innerHTML||'')){ extra.innerHTML += ` Holiday pay-by included: <strong>${e.holidayDueCount}</strong> item(s), <strong>${fmt(e.holidayDue)}</strong>.`; }
+  }
+  function updateCashflow(){
+    try{ if(originalCashflowRender) originalCashflowRender(); }catch(e){}
+    const e=estimateWithHoliday(); const cash=n(e.cashAvailable), due=n(e.bills&&e.bills.total)+n(e.debts&&e.debts.total)+n(e.holidayDue), living=n(e.living), totalShortfall=Math.max(0,due+living-cash), beforeLivingShortfall=Math.max(0,due-cash), buffer=Math.max(0,cash-due-living); const days=Math.max(0,Math.round(n(e.days))); const daysEl=document.getElementById('daysPayday'), note=document.getElementById('cashflowUntilPaydayNote'), breakdown=document.getElementById('cashflowUntilPaydayBreakdown');
+    if(daysEl){daysEl.textContent=String(days); daysEl.className='big value-soft '+(beforeLivingShortfall>0?'value-negative':(totalShortfall>0?'value-warning':'value-positive'));}
+    if(note){ const daysTxt=days+' day'+(days===1?'':'s')+' until payday'; if(beforeLivingShortfall>0) note.innerHTML=`${daysTxt}. <strong>Critical:</strong> ${fmt(beforeLivingShortfall)} due before living spend is covered.`; else if(totalShortfall>0) note.innerHTML=`${daysTxt}. <strong>Tight:</strong> planned weekly spend is short by ${fmt(totalShortfall)}.`; else note.innerHTML=`${daysTxt}. <strong>Covered:</strong> buffer after due bills/debts/holiday and planned spend is ${fmt(buffer)}.`; }
+    if(breakdown){ const plannedDaily=n(e.weekly)/7; const cashAfterDue=cash-due; breakdown.innerHTML=`<div class="cashflow-row"><span>Available real cash</span><strong>${fmt(cash)}</strong></div><div class="cashflow-row"><span>Bills/debts still due before payday</span><strong>-${fmt(n(e.bills&&e.bills.total)+n(e.debts&&e.debts.total))}</strong></div><div class="cashflow-row"><span>Holiday pay-by due before payday</span><strong>-${fmt(e.holidayDue)}</strong></div><div class="cashflow-row"><span>Cash left before living spend</span><strong>${fmt(cashAfterDue)}</strong></div><div class="cashflow-row"><span>Planned living spend reserve</span><strong>-${fmt(living)}</strong></div><div class="cashflow-row cashflow-total"><span>${totalShortfall>0?'Shortfall before payday':'Buffer after commitments'}</span><strong>${fmt(totalShortfall>0?totalShortfall:buffer)}</strong></div><p class="note">Holiday pay-by amounts only count here when the Pay by date is before the next payday. Weekly spend target stays as your own input: ${fmt(n(e.weekly))} per week (${fmt(plannedDaily)} per day).</p>`; }
+  }
+  function holidayItems(){ migrate(); const s=stateObj(); return (s&&Array.isArray(s.holidays)?s.holidays:[]).map(h=>{ const due=payByDate(h); const days=due?Math.ceil((due-todayStart())/DAY):9999; return {name:String(h[0]||'Holiday'),note:String(h[1]||''),remaining:remaining(h),date:due,days}; }).filter(x=>x.remaining>0).sort((a,b)=>a.days-b.days); }
+  function buildActions(){
+    const actions=[]; const s=stateObj()||{}; const debts=(Array.isArray(s.debts)?s.debts:[]).filter(d=>n(d&&d[1])>0).map((d,i)=>({d,i,type:debtType(d),priority:n((d&&d[6])||i+1)}));
+    const act=(level,title,meta,reason,score,kind)=>({level,title,meta,reason,score,kind}); const dueLabel=d=>{ if(!d) return ''; const diff=Math.ceil((d-todayStart())/DAY); if(diff<0) return 'date passed'; if(diff===0) return 'due today'; return 'due in '+diff+' day'+(diff===1?'':'s'); };
+    debts.filter(x=>x.type==='BNPL').sort((a,b)=>a.priority-b.priority).forEach((x,i)=>actions.push(act('amber','Clear '+String(x.d[0]||'BNPL debt'),fmt(x.d[1])+(debtDueDate(x.d)?' • '+dueLabel(debtDueDate(x.d)):''),'BNPL is treated as the highest short-term debt pressure and should be cleared before normal spending increases.',10+i,'bnpl-debt')));
+    debts.filter(x=>x.type==='One-off').sort((a,b)=>a.priority-b.priority).forEach((x,i)=>actions.push(act('amber','Clear '+String(x.d[0]||'one-off debt'),fmt(x.d[1])+(debtDueDate(x.d)?' • '+dueLabel(debtDueDate(x.d)):''),'One-off debts come after BNPL because they are still short-term commitments that can distort spare cash.',20+i,'one-off-debt')));
+    const sc=safeCalc(), target=n(sc.target), safe=n(sc.safeWeekly); if(safe+0.01<target) actions.push(act('amber','Protect weekly spend','Safe week: '+fmt(safe)+' / target '+fmt(target),'Your weekly target is not currently covered after due bills/debts/holiday pay-by amounts, so spending needs to be reduced unless the cash position changes.',30,'safe-spend'));
+    debts.filter(x=>x.type!=='BNPL'&&x.type!=='One-off').sort((a,b)=>a.priority-b.priority).forEach((x,i)=>actions.push(act('amber','Reduce '+String(x.d[0]||'loan/debt'),fmt(x.d[1])+' remaining'+(n(x.d[2])?' • '+fmt(x.d[2])+'/month':''),'Loans and regular/flexible debts are prioritised after BNPL, one-offs and safe weekly spend because they are longer-running pressure.',40+i,'loan-debt')));
+    try{ const od=window.Calc&&Calc.totalOverdraft?n(Calc.totalOverdraft()):0; if(od>0) actions.push(act('amber','Reduce overdraft reliance','Currently used: '+fmt(od),'Active overdraft use lowers your real bank position and increases financial pressure.',55,'overdraft')); }catch(e){}
+    const h=holidayItems()[0]; if(h && (h.days<=45 || /flight|due|deposit|stag|holiday/i.test(h.name+' '+h.note))) actions.push(act('amber','Ringfence '+h.name,fmt(h.remaining)+(h.days<9999?' • '+(h.days<0?'date passed':'due in '+h.days+' day'+(h.days===1?'':'s')):''),'This is an upcoming funding deadline and should be protected if it is still unpaid.',65,'funding'));
+    const comp=(Array.isArray(s.debts)?s.debts:[]).filter(d=>String(d&&d[0]||'').trim()&&n(d&&d[1])<=0); if(comp.length) actions.push(act('green','Review completed debts',comp.length+' debt'+(comp.length===1?' looks':'s look')+' complete','Archive or remove completed debts so the tracker and alerts stay clean.',70,'debt-review'));
+    const eg=Math.max(0,n(s.emergencyTarget||1000)-n(s.emergencyFund)); if(eg>0) actions.push(act('amber','Build emergency fund','Saved: '+fmt(n(s.emergencyFund))+' / '+fmt(n(s.emergencyTarget||1000)),'Emergency savings reduce future reliance on overdraft or debt.',80,'emergency'));
+    if(!actions.length) actions.push(act('green','Keep following the plan','No immediate finance alerts','Your saved figures do not show an urgent action right now.',999,'clear'));
+    return actions.sort((a,b)=>a.score-b.score);
+  }
+  function renderPriority(){
+    const actions=buildActions(); const top=actions[0]; const np=document.getElementById('nextPriority'); if(np&&top){np.textContent=top.title; np.setAttribute('title',top.title+' — '+top.reason);} const q=document.getElementById('priorityQueue'); if(q) q.innerHTML=actions.slice(0,6).map((a,i)=>`<div class="gos-priority-row"><span class="pill">#${i+1}</span> <strong>${esc(a.title)}</strong><br><span class="note">${esc(a.meta)} — ${esc(a.reason)}</span></div>`).join(''); const pr=document.getElementById('paydayResult'); if(pr&&top) pr.innerHTML='<div class="alert '+top.level+'">Current next priority: <strong>'+esc(top.title)+'</strong></div>'; const alerts=document.getElementById('alertsBox'); if(alerts) alerts.innerHTML=actions.slice(0,6).map(a=>'<div class="alert '+a.level+'"><strong>Action: '+esc(a.title)+'</strong><br><span class="note">'+esc(a.meta)+' — '+esc(a.reason)+'</span></div>').join('');
+  }
+  function renderAll(){ setVersion(); migrate(); renderTable(); renderMobile(); renderSummary(); updateSafeSpend(); updateCashflow(); updateSpare(); renderPriority(); try{ if(window.HealthV21&&HealthV21.render) HealthV21.render(); }catch(e){} try{ if(window.Timeline&&Timeline.render) Timeline.render(); }catch(e){} }
+  function refreshLive(){ renderSummary(); updateSafeSpend(); updateCashflow(); updateSpare(); renderPriority(); try{ if(window.HealthV21&&HealthV21.render) HealthV21.render(); }catch(e){} }
+  function scheduleLive(){ clearTimeout(liveTimer); liveTimer=setTimeout(refreshLive,120); }
+  function update(i,k,v){ migrate(); const s=stateObj(); if(!s||!s.holidays||!s.holidays[i]) return; s.holidays[i][k]=([2,3].includes(Number(k)))?n(v):v; save(); scheduleLive(); }
+  function add(){ migrate(); const s=stateObj(); if(!s) return; s.holidays.push(['New holiday','',0,0,'','']); save(); renderAll(); }
+  function remove(i){ migrate(); const s=stateObj(); if(!s||!Array.isArray(s.holidays)) return; if(confirm('Remove this holiday?')){ s.holidays.splice(Number(i),1); save(); renderAll(); } }
+  function patch(){
+    migrate();
+    try{ if(window.Calc){ Calc.holidayStatus=holidayStatus; Calc.holidayPayByDate=function(h){return payByDate(h);}; Calc.holidayDueBeforePayday=function(){return holidayDueBeforePayday();}; } }catch(e){}
+    try{ if(window.GrantOSDueDateV2835){ GrantOSDueDateV2835.estimate=estimateWithHoliday; } }catch(e){}
+    try{ if(window.GrantOSCashflowWarningCard){ GrantOSCashflowWarningCard.estimate=estimateWithHoliday; GrantOSCashflowWarningCard.render=updateCashflow; } }catch(e){}
+    try{ if(window.GrantOSSafeSpendV284){ GrantOSSafeSpendV284.calculate=safeCalc; GrantOSSafeSpendV284.refresh=function(){updateSafeSpend(); updateCashflow(); updateSpare();}; } if(window.GrantOSSafeSpendV285){ GrantOSSafeSpendV285.calculate=safeCalc; GrantOSSafeSpendV285.refresh=function(){updateSafeSpend(); updateCashflow(); updateSpare();}; } }catch(e){}
+    try{ if(window.Calc){ Calc.safeWeek=function(){return safeCalc().safeWeekly;}; Calc.safeToday=function(){return safeCalc().safeDaily;}; Calc.safeSpendLivingPot=function(){return safeCalc().livingSpendPot;}; Calc.trueSpareAfterCommitmentsBreakdown=estimateWithHoliday; Calc.estimatedSpareAfterWageBreakdown=estimateWithHoliday; Calc.trueSpareAfterCommitments=function(){return estimateWithHoliday().value;}; Calc.estimatedSpareAfterWage=function(){return estimateWithHoliday().value;}; } }catch(e){}
+    try{ if(window.Holidays){ Holidays.render=renderAll; Holidays.add=add; Holidays.remove=remove; } }catch(e){}
+    try{ if(window.GrantOSBuild301){ GrantOSBuild301.buildActions=buildActions; GrantOSBuild301.topAction=function(){return buildActions()[0];}; } }catch(e){}
+  }
+  function boot(){ patch(); renderAll(); [160,500,1200,2500].forEach(ms=>setTimeout(()=>{patch(); refreshLive();},ms)); }
+  document.addEventListener('input',function(e){ if(e.target&&e.target.closest&&e.target.closest('#holidays,#holidayTable,#v274HolidayMobile,#budget,#fixedCostsTable,#debtTable,#v274FixedCostsMobile,#v274DebtMobile,#v25531LinkedAccountsTable,#v274AccountsMobile')) setTimeout(refreshLive,120); },true);
+  document.addEventListener('change',function(e){ if(e.target&&e.target.closest&&e.target.closest('#holidays,#holidayTable,#v274HolidayMobile,#budget,#fixedCostsTable,#debtTable,#v274FixedCostsMobile,#v274DebtMobile,#v25531LinkedAccountsTable,#v274AccountsMobile')) setTimeout(refreshLive,150); },true);
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot(); window.addEventListener('load',boot);
+  window.GrantOSHolidaySync={VERSION,update,add,remove,renderAll,refreshAll:renderAll,refreshLive,holidayStatus,holidayDueBeforePayday,safeCalc,estimateWithHoliday,buildActions};
+})();
+</script>
+
+
+<style id="build30DropdownSummaryCleanupStyle">
+/* Build 3.0 dropdown restore: restores the card sub-heading dropdowns after later render patches. */
+.gos-section-dropdown{margin-top:12px;border:1px solid rgba(148,163,184,.18);border-radius:16px;background:rgba(15,23,42,.34);overflow:hidden;}
+.gos-section-dropdown summary{cursor:pointer;list-style:none;padding:12px 14px;font-weight:900;color:#dbeafe;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;}
+.gos-section-dropdown summary::-webkit-details-marker{display:none;}
+.gos-section-dropdown summary:after{content:'⌄';font-size:1rem;color:#93c5fd;transition:transform .18s ease;flex:0 0 auto;}
+.gos-section-dropdown[open] summary:after{transform:rotate(180deg);}
+.gos-dropdown-content{padding:0 12px 12px;}
+.gos-dropdown-content table{margin-top:0;}
+.gos-budget-bills-summary-card,.v276-debt-summary-card{min-height:unset!important;}
+.gos-summary-total,.v276-summary-total{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid rgba(148,163,184,.18);background:rgba(15,23,42,.40);border-radius:14px;padding:12px 14px;margin:10px 0;font-weight:800;}
+.gos-summary-total strong,.v276-summary-total strong{font-size:1.25rem;color:#e0f2fe;white-space:nowrap;}
+.gos-summary-list,.v276-debt-list{display:grid;gap:8px;margin-top:10px;}
+.gos-summary-line,.v276-debt-line{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;border:1px solid rgba(148,163,184,.14);background:rgba(15,23,42,.26);border-radius:12px;padding:9px 10px;}
+.gos-summary-line span,.v276-debt-line span{min-width:0;overflow-wrap:anywhere;}
+.gos-summary-line em,.v276-debt-line em{display:block;font-style:normal;color:#94a3b8;font-size:.78rem;margin-top:2px;}
+.gos-summary-line strong,.v276-debt-line strong{white-space:nowrap;color:#f8fafc;}
+@media(max-width:760px){
+  .gos-section-dropdown summary{padding:11px 12px;font-size:.95rem;}
+  .gos-dropdown-content{padding:0 10px 10px;}
+  .gos-summary-line,.v276-debt-line{display:block;}
+  .gos-summary-line strong,.v276-debt-line strong{display:block;margin-top:5px;}
+}
+</style>
+<script id="build30DropdownSummaryCleanup">
+(function(){
+  const PATCH='build30DropdownSummaryCleanup';
+  const esc=s=>String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]));
+  const num=v=>{ const n=Number(String(v??'').replace(/[^0-9.-]/g,'')); return Number.isFinite(n)?n:0; };
+  const money=v=>'£'+num(v).toLocaleString('en-GB',{maximumFractionDigits:2});
+  const norm=s=>String(s||'').trim().toLowerCase().replace(/\s+/g,' ');
+  let timer=null;
+
+  function cardByHeading(sectionSel, patterns){
+    const section=document.querySelector(sectionSel); if(!section) return null;
+    const pats=(Array.isArray(patterns)?patterns:[patterns]).map(p=>p instanceof RegExp?p:new RegExp('^'+String(p).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'$','i'));
+    const cards=[...section.querySelectorAll('.card,.v25527-summary-card')];
+    return cards.find(card=>{
+      const h=card.querySelector('h3'); const txt=(h&&h.textContent||'').trim();
+      return pats.some(p=>p.test(txt));
+    })||null;
+  }
+
+  function directChildren(el){ return Array.from(el.childNodes); }
+  function ensureDropdown(card, key, summaryText, anchor){
+    if(!card) return;
+    anchor = anchor || card.querySelector('h3');
+    if(!anchor) return;
+    const cls='gos-dd-'+key;
+    let details=Array.from(card.children).find(el=>el.classList&&el.classList.contains(cls));
+    if(!details){
+      details=document.createElement('details');
+      details.className='gos-section-dropdown '+cls;
+      const summary=document.createElement('summary');
+      const body=document.createElement('div'); body.className='gos-dropdown-content';
+      details.appendChild(summary); details.appendChild(body);
+      anchor.insertAdjacentElement('afterend', details);
+    }
+    const summary=details.querySelector('summary'); if(summary) summary.textContent=summaryText;
+    const body=details.querySelector('.gos-dropdown-content') || details.appendChild(document.createElement('div'));
+    body.className='gos-dropdown-content';
+    let seenAnchor=false;
+    directChildren(card).forEach(node=>{
+      if(node===anchor){ seenAnchor=true; return; }
+      if(node===details) return;
+      if(!seenAnchor) return;
+      if(node.nodeType===3 && !String(node.textContent||'').trim()) return;
+      body.appendChild(node);
+    });
+  }
+
+  function normalBillRows(){
+    const fixed=(typeof state!=='undefined' && Array.isArray(state.fixed))?state.fixed:[];
+    const debtNames=new Set(((typeof state!=='undefined' && Array.isArray(state.debts))?state.debts:[]).map(d=>norm(d&&d[0])).filter(Boolean));
+    return fixed.filter(r=>r && !debtNames.has(norm(r[0]))).map(r=>({name:r[0]||'Bill', amount:num(r[1]), due:r[2]||''}));
+  }
+
+  function renderBillsSummary(){
+    try{
+      const fixed=cardByHeading('#budget',[/^Monthly Fixed Costs/i,/^Monthly Fixed Costs \/ Bills/i]);
+      if(!fixed) return;
+      let card=document.getElementById('gosBudgetBillsSummaryCard');
+      if(!card){
+        card=document.createElement('div');
+        card.id='gosBudgetBillsSummaryCard';
+        card.className='card full gos-budget-bills-summary-card';
+        fixed.insertAdjacentElement('afterend', card);
+      }
+      const rows=normalBillRows();
+      const total=rows.reduce((s,r)=>s+num(r.amount),0);
+      card.innerHTML=`
+        <h3>Monthly Bills from Budget Setup</h3>
+        <p class="note">Normal bills only. Debt repayments are shown in the Debt Tracker tab and still feed the wider calculations automatically.</p>
+        <div class="gos-summary-total"><span>Monthly bills total</span><strong>${money(total)}</strong></div>
+        ${rows.length?`<div class="gos-summary-list">${rows.map(r=>`<div class="gos-summary-line"><span>${esc(r.name)}${r.due?`<em>Due ${esc(r.due)}</em>`:''}</span><strong>${money(r.amount)}</strong></div>`).join('')}</div>`:`<div class="v274-mobile-empty">No monthly bills currently entered.</div>`}
+      `;
+    }catch(e){ console.warn(PATCH,'bills summary',e); }
+  }
+
+  function debtRepaymentRows(){
+    try{
+      if(typeof Calc!=='undefined' && Calc && typeof Calc.debtMonthlyRows==='function'){
+        const rows=Calc.debtMonthlyRows();
+        if(Array.isArray(rows)) return rows.map(r=>({name:r.name||'Debt', type:r.type||'', monthly:num(r.monthly)}));
+      }
+    }catch(e){}
+    const debts=(typeof state!=='undefined' && Array.isArray(state.debts))?state.debts:[];
+    return debts.filter(d=>d&&num(d[2])>0&&num(d[1])>0).map(d=>({name:d[0]||'Debt',type:d[4]||'',monthly:num(d[2])}));
+  }
+
+  function renderDebtRepaymentsInDebtTab(){
+    try{
+      const grid=document.querySelector('#debts .grid'); if(!grid) return;
+      let card=document.getElementById('v276DebtRepaymentsCard');
+      if(!card){ card=document.createElement('div'); card.id='v276DebtRepaymentsCard'; }
+      card.className='card wide v276-debt-summary-card';
+      const progress=cardByHeading('#debts','Debt Progress');
+      const tracker=cardByHeading('#debts','Debt Tracker');
+      if(!card.closest('#debts')){
+        if(progress) progress.insertAdjacentElement('afterend',card);
+        else if(tracker) tracker.insertAdjacentElement('afterend',card);
+        else grid.insertBefore(card, grid.firstChild);
+      }
+      const rows=debtRepaymentRows();
+      const total=rows.reduce((s,r)=>s+num(r.monthly),0);
+      card.innerHTML=`
+        <h3>Debt Repayments</h3>
+        <p class="note">Read-only summary. Add, remove or edit debt repayments above in Debt Tracker.</p>
+        <div class="v276-summary-total"><span>Monthly debt repayments</span><strong>${money(total)}</strong></div>
+        ${rows.length?`<div class="v276-debt-list">${rows.map(r=>`<div class="v276-debt-line"><span>${esc(r.name)} <em>${esc(r.type)}</em></span><strong>${money(r.monthly)}</strong></div>`).join('')}</div>`:`<div class="v274-mobile-empty">No monthly debt repayments currently active.</div>`}
+      `;
+    }catch(e){ console.warn(PATCH,'debt repayment move',e); }
+  }
+
+  function wrapBudgetSections(){
+    const core=cardByHeading('#budget','Core Figures'); ensureDropdown(core,'budget-core','Open core figures', core&&core.querySelector('h3'));
+    const linked=document.getElementById('v25531BudgetAccountsCard'); if(linked){ const head=linked.querySelector('.v25531-linked-head') || linked.querySelector('h3'); ensureDropdown(linked,'budget-linked','Open linked accounts', head); }
+    const fixed=cardByHeading('#budget',[/^Monthly Fixed Costs/i,/^Monthly Fixed Costs \/ Bills/i]); ensureDropdown(fixed,'budget-bills','Open monthly bills', fixed&&fixed.querySelector('h3'));
+  }
+  function wrapDebtSections(){
+    const tracker=cardByHeading('#debts','Debt Tracker'); ensureDropdown(tracker,'debt-tracker','Open debt accounts', tracker&&tracker.querySelector('h3'));
+    const progress=cardByHeading('#debts','Debt Progress'); ensureDropdown(progress,'debt-progress','Open debt progress', progress&&progress.querySelector('h3'));
+    const repay=document.getElementById('v276DebtRepaymentsCard'); ensureDropdown(repay,'debt-repayments','Open debt repayments', repay&&repay.querySelector('h3'));
+  }
+  function wrapHolidaySections(){
+    const pots=cardByHeading('#holidays','Holiday Pots'); ensureDropdown(pots,'holiday-pots','Open holiday pots', pots&&pots.querySelector('h3'));
+    const summary=cardByHeading('#holidays','Holiday Summary'); ensureDropdown(summary,'holiday-summary','Open holiday summary', summary&&summary.querySelector('h3'));
+  }
+  function run(){
+    try{
+      if(window.GrantOSGuidanceV28 && typeof GrantOSGuidanceV28.render==='function') GrantOSGuidanceV28.render();
+      renderBillsSummary(); renderDebtRepaymentsInDebtTab(); wrapBudgetSections(); wrapDebtSections(); wrapHolidaySections();
+    }catch(e){ console.warn(PATCH,e); }
+  }
+  function schedule(ms){ clearTimeout(timer); timer=setTimeout(run,ms||120); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run); else run();
+  window.addEventListener('load',()=>{ run(); [120,350,900,1800,3200].forEach(ms=>setTimeout(run,ms)); });
+  document.addEventListener('click',()=>schedule(140),true);
+  document.addEventListener('input',()=>schedule(180),true);
+  document.addEventListener('change',()=>schedule(180),true);
+  window.GrantOSBuild30DropdownSummaryCleanup={run, schedule};
+})();
+</script>
+
+
+
+<style id="build30RequestedCleanupStyle">
+/* Build 3.0 requested cleanup: restore Estimated Spare dropdowns, remove old queue/snapshot cards, and move Holiday Funding to Holiday Pots. */
+#debts .card:has(> h3:first-child), #graphs .card:has(> h3:first-child){overflow-anchor:none;}
+#gosHolidayFundingCard{overflow-anchor:none!important;}
+#gosHolidayFundingCard #holidayFundingGraph{min-height:82px;}
+#v283EstimatedSpareCard .gos-spare-dd{margin-top:12px;border:1px solid rgba(148,163,184,.18);border-radius:16px;background:rgba(15,23,42,.34);overflow:hidden;}
+#v283EstimatedSpareCard .gos-spare-dd summary{cursor:pointer;list-style:none;padding:12px 14px;font-weight:900;color:#dbeafe;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;}
+#v283EstimatedSpareCard .gos-spare-dd summary::-webkit-details-marker{display:none;}
+#v283EstimatedSpareCard .gos-spare-dd summary:after{content:'⌄';font-size:1rem;color:#93c5fd;transition:transform .18s ease;flex:0 0 auto;}
+#v283EstimatedSpareCard .gos-spare-dd[open] summary:after{transform:rotate(180deg);}
+#v283EstimatedSpareCard .gos-spare-dd-body{padding:0 12px 12px;}
+#v283EstimatedSpareCard .gos-spare-dd-body .note{margin-top:0;}
+#v283EstimatedSpareCard .gos-spare-dd-body .v283-spare-breakdown{margin-top:0;}
+#v283EstimatedSpareCard .gos-spare-dd-body #v283SpareValue{margin-top:4px;}
+@media(max-width:760px){#v283EstimatedSpareCard .gos-spare-dd summary{padding:11px 12px;font-size:.95rem;}#v283EstimatedSpareCard .gos-spare-dd-body{padding:0 10px 10px;}}
+</style>
+<script id="build30RequestedCleanup">
+(function(){
+  const PATCH='build30RequestedCleanup';
+  let timer=null;
+  function text(el){return String((el&&el.textContent)||'').trim().toLowerCase().replace(/\s+/g,' ');}
+  function section(id){return document.querySelector(id+' .grid') || document.querySelector(id);}
+  function cardByHeading(sectionSel, heading){
+    const sec=document.querySelector(sectionSel); if(!sec) return null;
+    const h=String(heading||'').trim().toLowerCase();
+    return Array.from(sec.querySelectorAll('.card')).find(card=>{
+      const head=card.querySelector('h3'); return text(head)===h;
+    }) || null;
+  }
+  function removeCard(sectionSel, heading){
+    const card=cardByHeading(sectionSel, heading); if(card) card.remove();
+  }
+  function ensureHolidayFundingCard(){
+    const grid=section('#holidays'); if(!grid) return null;
+    let card=document.getElementById('gosHolidayFundingCard');
+    if(!card){
+      // Reuse the old graph card if it exists, otherwise create a clean Holiday Pots card.
+      card=cardByHeading('#graphs','Holiday Funding');
+      if(card){ card.id='gosHolidayFundingCard'; }
+      else{
+        card=document.createElement('div');
+        card.id='gosHolidayFundingCard';
+        card.className='card full';
+        card.innerHTML='<h3>Holiday Funding</h3><div id="holidayFundingGraph"></div>';
+      }
+    }
+    card.className='card full';
+    if(!card.querySelector('#holidayFundingGraph')){
+      let body=document.createElement('div'); body.id='holidayFundingGraph'; card.appendChild(body);
+    }
+    const summary=cardByHeading('#holidays','Holiday Summary');
+    if(card.parentElement!==grid){
+      if(summary) summary.insertAdjacentElement('afterend', card);
+      else grid.appendChild(card);
+    }else if(summary && summary.nextElementSibling!==card){
+      summary.insertAdjacentElement('afterend', card);
+    }
+    return card;
+  }
+  function restoreSpareDropdowns(){
+    const card=document.getElementById('v283EstimatedSpareCard'); if(!card) return;
+    const h=card.querySelector('h3'); if(!h) return;
+
+    let fig=card.querySelector('#gosSpareFiguresDropdown');
+    if(!fig){
+      fig=document.createElement('details'); fig.id='gosSpareFiguresDropdown'; fig.className='gos-spare-dd'; fig.open=true;
+      fig.innerHTML='<summary>Open figures</summary><div class="gos-spare-dd-body" id="gosSpareFiguresBody"></div>';
+      h.insertAdjacentElement('afterend', fig);
+    }
+    let calc=card.querySelector('#gosSpareCalculationDropdown');
+    if(!calc){
+      calc=document.createElement('details'); calc.id='gosSpareCalculationDropdown'; calc.className='gos-spare-dd';
+      calc.innerHTML='<summary>Open calculation</summary><div class="gos-spare-dd-body" id="gosSpareCalculationBody"></div>';
+      fig.insertAdjacentElement('afterend', calc);
+    }
+    const figBody=card.querySelector('#gosSpareFiguresBody');
+    const calcBody=card.querySelector('#gosSpareCalculationBody');
+    const moveTo=(el,body)=>{ if(el&&body&&el.parentElement!==body) body.appendChild(el); };
+
+    // Figures dropdown: note, main value and status.
+    moveTo(Array.from(card.children).find(el=>el.tagName==='P' && el.classList.contains('note')), figBody);
+    moveTo(document.getElementById('v283SpareValue'), figBody);
+    moveTo(document.getElementById('v283SpareStatus'), figBody);
+
+    // Calculation dropdown: all current row-by-row calculation details.
+    moveTo(card.querySelector('.v283-spare-breakdown'), calcBody);
+    moveTo(document.getElementById('v283DateAwareBreakdownNote'), calcBody);
+  }
+  function renderHolidayFunding(){
+    try{ if(window.GraphsV21&&typeof GraphsV21.holidayFunding==='function') GraphsV21.holidayFunding(); }catch(e){}
+    try{ if(window.GraphsV24&&typeof GraphsV24.holidayFunding==='function') GraphsV24.holidayFunding(); }catch(e){}
+    try{ if(window.EnhancedGraphsV242&&typeof EnhancedGraphsV242.holidayFunding==='function') EnhancedGraphsV242.holidayFunding(); }catch(e){}
+  }
+  function run(){
+    try{
+      // Requested removals.
+      removeCard('#debts','Priority Queue');
+      removeCard('#graphs','Financial Snapshot');
+      // Holiday Funding no longer lives in Graphs; it is its own Holiday Pots card.
+      const holidayCard=ensureHolidayFundingCard();
+      removeCard('#graphs','Holiday Funding');
+      if(holidayCard && !holidayCard.parentElement) ensureHolidayFundingCard();
+      restoreSpareDropdowns();
+      renderHolidayFunding();
+    }catch(e){ console.warn(PATCH,e); }
+  }
+  function schedule(ms){clearTimeout(timer); timer=setTimeout(run,ms||100);}
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run); else run();
+  window.addEventListener('load',()=>{run(); [120,350,900,1800,3200].forEach(ms=>setTimeout(run,ms));});
+  document.addEventListener('click',()=>schedule(120),true);
+  document.addEventListener('input',()=>schedule(180),true);
+  document.addEventListener('change',()=>schedule(180),true);
+  window.GrantOSBuild30RequestedCleanup={run,schedule};
 })();
 </script>
 
