@@ -1,4 +1,4 @@
-const CACHE_NAME = 'grant-os-tester-build-3-0-first-launch-onboarding';
+const CACHE_NAME = 'grant-od-tester-build-3-0-github-repo-input-stability-fix';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './favicon-32.png', './apple-touch-icon.png'];
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -15,3 +15,5 @@ self.addEventListener('fetch', event => {
     return response;
   }).catch(() => caches.match(event.request).then(cached => cached || caches.match('./index.html'))));
 });
+
+// GitHub Pages target: https://grantbulmer.github.io/Grant-OD-Tester/
