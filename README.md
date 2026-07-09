@@ -1,9 +1,14 @@
-# Grant OS
+# Grant OS Tester Build 3.0 - First Launch Onboarding
 
-Copyright © 2026 Grant Bulmer. All rights reserved.
+Tester-only build based on the current main build.
 
-This app, source code, layout, written content, calculations, design structure and branding are owned by Grant Bulmer.
+Changes in this tester build only:
+- Personal default app data has been removed from the starting dataset.
+- Tester data uses separate localStorage keys so it does not load the main-build saved data from the same GitHub Pages origin.
+- Added a one-time first-launch onboarding message with 5 slides: Accounts, Budget Setup, Debt Tracker, Holiday Pots and Grant OS Helper.
+- The onboarding message uses a stable localStorage key and appears once only on first launch.
 
-No permission is given to copy, modify, redistribute, sell, rebrand, publish, or use this app or its source code commercially without written permission from Grant Bulmer.
+No layout, calculations, dropdowns, totals, graphs or existing app functions were intentionally changed.
 
-This repository is not open source. Do not add an MIT, Apache, GPL, or other open-source licence unless Grant Bulmer explicitly chooses to release it under that licence.
+Chrome test link:
+https://grantbulmer.github.io/Grant-OS/?v=tester-build-3-0-first-launch-onboarding
