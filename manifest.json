@@ -1,7 +1,7 @@
 {
-  "name": "Grant OS Main Build 3.0",
-  "short_name": "Grant OS",
-  "start_url": "./?v=main-build-3-0-no-priority-spare-dropdown",
+  "name": "Grant OS Test Build 3.0",
+  "short_name": "Grant OS Test",
+  "start_url": "./?v=test-build-3-0-four-slide-intro",
   "scope": "./",
   "display": "standalone",
   "background_color": "#071021",
