@@ -1,7 +1,7 @@
 {
-  "name": "Grant OS Test Build 3.0",
-  "short_name": "Grant OS Test",
-  "start_url": "./?v=tester-build-3-0-bill-input-stability-fix",
+  "name": "Grant OS Tester Build 3.0",
+  "short_name": "Test Build 3.0",
+  "start_url": "./?v=tester-build-3-0-bill-keyboard-stability-fix",
   "scope": "./",
   "display": "standalone",
   "background_color": "#071021",
@@ -17,5 +17,6 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "version": "tester-build-3-0-bill-keyboard-stability-fix"
 }
